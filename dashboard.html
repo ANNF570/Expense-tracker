@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Neon Expense – Dashboard</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="style.css">
+
+    <!-- ChartJS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="card header">
+            <div class="brand">
+                <div class="logo">ET</div>
+                <div>
+                    <div style="font-weight:800;">Neon Expense</div>
+                    <div style="opacity:0.85;font-size:13px;">Real-time dashboard</div>
+                </div>
+            </div>
+
+            <div class="top-controls">
+                <select id="currency" class="select" onchange="setCurrency(this.value)">
+          <option value="INR">₹ INR</option>
+          <option value="USD">$ USD</option>
+          <option value="EUR">€ EUR</option>
+        </select>
+
+                <div style="text-align:right;">
+                    <div id="userEmail" style="font-weight:700"></div>
+                    <button class="btn" style="padding:8px 12px;" onclick="signOut()">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="app">
+
+            <!-- LEFT PANEL -->
+            <div class="left card">
+                <h2>Add Expense</h2>
+
+                <div class="form-row">
+                    <input id="title" class="input" placeholder="Title">
+                    <input id="amount" class="input" type="number" placeholder="Amount">
+                </div>
+
+                <div class="form-row">
+                    <select id="category" class="select">
+            <option>Food</option>
+            <option>Transport</option>
+            <option>Shopping</option>
+            <option>Bills</option>
+            <option>Entertainment</option>
+            <option>Other</option>
+          </select>
+
+                    <input id="date" class="input" type="date">
+                </div>
+
+                <button class="btn" onclick="addExpense()">Add</button>
+
+                <h3>Summary</h3>
+                <div class="summary">
+                    <div class="sum-box">
+                        <h4>Total</h4>
+                        <p id="total">0</p>
+                    </div>
+                    <div class="sum-box">
+                        <h4>Month</h4>
+                        <p id="monthTotal">0</p>
+                    </div>
+                    <div class="sum-box">
+                        <h4>Items</h4>
+                        <p id="count">0</p>
+                    </div>
+                </div>
+
+                <h3>Export / Import</h3>
+                <div style="display:flex;gap:10px;">
+                    <button class="btn" onclick="exportUserData()" style="width:auto;padding:8px 12px;">Export</button>
+                    <label class="btn" style="width:auto;padding:8px 12px;cursor:pointer;">
+            Import
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importUserData(event)">
+          </label>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div class="right">
+                <div class="charts">
+                    <div class="chart-card card">
+                        <h4>Monthly Trend</h4>
+                        <canvas id="lineChart" height="160"></canvas>
+                    </div>
+
+                    <div class="chart-card card">
+                        <h4>Category Distribution</h4>
+                        <canvas id="pieChart" height="160"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card card bar-box">
+                    <h4>Category Bar</h4>
+                    <canvas id="barChart" height="120"></canvas>
+                </div>
+
+                <h3>Expenses</h3>
+                <div id="list" class="expense-list card"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
+            authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
+            projectId: "expense-tracker-akif-832fb",
+            storageBucket: "expense-tracker-akif-832fb.firebasestorage.app",
+            messagingSenderId: "846826483222",
+            appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37",
+            measurementId: "G-ZSM3KCK8RF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

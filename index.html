@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Neon Expense – Login</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+
+<body>
+    <div class="auth-wrap">
+        <div class="card auth-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                <div>
+                    <h1>Neon Expense</h1>
+                    <div style="opacity:0.8;">Manage your expenses in real-time</div>
+                </div>
+                <div class="logo">ET</div>
+            </div>
+
+            <!-- LOGIN -->
+            <div id="loginView">
+                <input id="log-email" class="input" type="email" placeholder="Email">
+                <input id="log-pass" class="input" type="password" placeholder="Password">
+                <button class="btn" onclick="doLogin()">Login</button>
+                <div class="small">Create account? <a href="#" onclick="showSignup()">Signup</a></div>
+            </div>
+
+            <!-- SIGNUP -->
+            <div id="signupView" style="display:none;">
+                <input id="su-email" class="input" type="email" placeholder="Email">
+                <input id="su-pass" class="input" type="password" placeholder="Password (min 6)">
+                <button class="btn" onclick="doSignup()">Signup</button>
+                <div class="small">Already have account? <a href="#" onclick="showLogin()">Login</a></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase Init -->
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
+            authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
+            projectId: "expense-tracker-akif-832fb",
+            storageBucket: "expense-tracker-akif-832fb.firebasestorage.app",
+            messagingSenderId: "846826483222",
+            appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37",
+            measurementId: "G-ZSM3KCK8RF"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
