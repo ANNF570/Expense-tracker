@@ -184,6 +184,73 @@
             background: #111;
             border-radius: 8px;
         }
+        /* ---------------- MOBILE RESPONSIVE — PROFILE PAGE ---------------- */
+        
+        @media (max-width: 700px) {
+            /* Stack layout */
+            .row {
+                flex-direction: column !important;
+                align-items: center !important;
+                text-align: center !important;
+                gap: 24px !important;
+            }
+            /* Left column (profile picture section) */
+            .left-col {
+                width: 100% !important;
+                max-width: 260px !important;
+                margin: 0 auto !important;
+                text-align: center !important;
+            }
+            .profile-pic {
+                width: 140px !important;
+                height: 140px !important;
+                border-width: 3px !important;
+                margin-bottom: 12px !important;
+            }
+            #changePicBtn,
+            #removePicBtn {
+                width: 100% !important;
+                max-width: 260px !important;
+                font-size: 15px !important;
+                margin-top: 10px !important;
+            }
+            /* Right column (form) */
+            .right-col {
+                width: 100% !important;
+                text-align: center !important;
+            }
+            .right-col .input,
+            .right-col .textarea,
+            .right-col select {
+                width: 100% !important;
+                font-size: 15px !important;
+            }
+            /* Gender + DOB row */
+            .flex-row {
+                flex-direction: column !important;
+                gap: 12px !important;
+            }
+            /* Password fields */
+            .pass-wrap {
+                text-align: left !important;
+                width: 100% !important;
+            }
+            .toggle-eye {
+                right: 14px !important;
+                top: 50% !important;
+            }
+            /* Buttons */
+            #saveProfileBtn,
+            #changePassBtn {
+                width: 100% !important;
+                font-size: 16px !important;
+            }
+            .small-link {
+                text-align: center !important;
+                display: block;
+                margin-top: 20px !important;
+            }
+        }
     </style>
 </head>
 

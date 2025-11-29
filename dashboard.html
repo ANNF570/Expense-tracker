@@ -95,7 +95,30 @@
                     </div>
                 </div>
 
-                <h3>Export / Import</h3>
+                <!-- export controls (put inside your dashboard where you want the buttons) -->
+                <div class="card">
+                    <h3>Export / Import</h3>
+
+                    <!-- optional filters -->
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+                        <input type="date" id="exportFrom" class="input" style="max-width:160px;">
+                        <input type="date" id="exportTo" class="input" style="max-width:160px;">
+                        <select id="exportCategory" class="input" style="max-width:180px;">
+      <option value="">All categories</option>
+      <option>Food</option>
+      <option>Transport</option>
+      <option>Shopping</option>
+      <option>Entertainment</option>
+      <option>Bills</option>
+      <option>Other</option>
+    </select>
+                    </div>
+
+                    <div style="display:flex;gap:12px;">
+                        <button id="btnExportPDF" class="btn" style="max-width:140px;">Export PDF</button>
+                        <button id="btnExportWord" class="btn" style="max-width:140px;background:linear-gradient(90deg,#ff9a9e,#ff2ec4);">Export Word</button>
+                    </div>
+                </div>
                 <div style="display:flex;gap:10px;">
                     <button class="btn" onclick="exportUserData()" style="width:auto;padding:8px 12px;">Export</button>
                     <label class="btn" style="width:auto;padding:8px 12px;cursor:pointer;">
@@ -145,6 +168,9 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
     </script>
+    <!-- jsPDF + AutoTable for PDF tables -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
     <script src="app.js"></script>
     <!-- ============================

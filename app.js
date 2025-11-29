@@ -592,3 +592,247 @@ window.showToast = function(msg, type = "normal") {
         div.remove();
     }, 3200);
 };
+// ------------- Export: PDF + Word ----------------
+// Requires: jspdf and autotable loaded (see CDN includes above).
+// Place this code after currentUser and expenses are available (eg inside dashboard.js scope).
+
+// Utility: format date -> YYYY-MM-DD (for filenames and display)
+function fmtDateForFile(d = new Date()) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}${m}${day}`;
+}
+
+// Utility: convert ISO date or 'YYYY-MM-DD' to display form
+function fmtDateDisplay(d) {
+    if (!d) return '';
+    const dd = new Date(d);
+    if (isNaN(dd)) return d;
+    return dd.toISOString().slice(0, 10);
+}
+
+// collect filters from UI
+function getExportFilters() {
+    const from = document.getElementById('exportFrom').value || null;
+    const to = document.getElementById('exportTo').value || null;
+    const cat = document.getElementById('exportCategory').value || '';
+    return { from, to, category: cat };
+}
+
+// apply filters to the global 'expenses' array
+function filteredExpensesList(filters) {
+    const list = (window.expenses || []).slice(); // clone
+    return list.filter(e => {
+        if (!e) return false;
+        if (filters.category && filters.category !== '' && e.category !== filters.category) return false;
+        if (filters.from) {
+            if (!e.date) return false;
+            if (e.date < filters.from) return false;
+        }
+        if (filters.to) {
+            if (!e.date) return false;
+            if (e.date > filters.to) return false;
+        }
+        return true;
+    });
+}
+
+// compute summaries: totals by category and date-range total
+function computeSummaries(list) {
+    const byCategory = {};
+    let fullTotalINR = 0;
+    for (const it of list) {
+        const amt = Number(it.amount || 0);
+        fullTotalINR += amt;
+        byCategory[it.category] = (byCategory[it.category] || 0) + amt;
+    }
+    return { byCategory, fullTotalINR };
+}
+
+// Build PDF (using jsPDF + autoTable)
+async function exportToPDF() {
+    const filters = getExportFilters();
+    const list = filteredExpensesList(filters);
+
+    // filename
+    const uid = (window.currentUser && window.currentUser.uid) || 'anon';
+    const filename = `spendora-${uid}-${fmtDateForFile(new Date())}.pdf`;
+
+    // Build document
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' }); // pt-based sizing
+
+    const margin = 40;
+    let y = 40;
+
+    // Header
+    doc.setFontSize(18);
+    doc.setTextColor(240, 240, 255);
+    doc.text('Spendora — Expense Report', margin, y);
+    doc.setFontSize(10);
+    y += 18;
+    doc.setTextColor(180, 180, 200);
+    const filText = `Generated: ${new Date().toLocaleString()}  •  Filters: ${filters.category || 'All'}, ${filters.from || 'Any'} → ${filters.to || 'Any'}`;
+    doc.text(filText, margin, y);
+
+    // Table rows
+    y += 22;
+
+    // Prepare table body
+    const tableBody = list.map(it => {
+        return [
+            it.title || '',
+            it.category || '',
+            (it.amount ? (Number(it.amount) * (rates && rates[currency] ? rates[currency] : 1)).toFixed(2) : '0.00'),
+            it.date || '',
+            (it.createdAt && it.createdAt.toDate ? it.createdAt.toDate().toISOString().slice(0, 19).replace('T', ' ') : (it.createdAt || '')),
+            it.id || '',
+            (it.note ? 'Yes' : 'No')
+        ];
+    });
+
+    // autoTable columns
+    const columns = [
+        { header: 'Title', dataKey: 'title' },
+        { header: 'Category', dataKey: 'category' },
+        { header: `Amount (${sym(currency)})`, dataKey: 'amount' },
+        { header: 'Date', dataKey: 'date' },
+        { header: 'CreatedAt', dataKey: 'createdAt' },
+        { header: 'ID', dataKey: 'id' },
+        { header: 'Note', dataKey: 'note' }
+    ];
+
+    // If no items, print message
+    if (tableBody.length === 0) {
+        doc.setFontSize(12);
+        doc.text('No expense records match the selected filters.', margin, y + 10);
+    } else {
+        // Use autoTable
+        doc.autoTable({
+            startY: y,
+            head: [columns.map(c => c.header)],
+            body: tableBody,
+            styles: {
+                halign: 'left',
+                fontSize: 10,
+                cellPadding: 6,
+                textColor: [220, 220, 230]
+            },
+            headStyles: {
+                fillColor: [20, 20, 35],
+                textColor: [200, 240, 255],
+                fontStyle: 'bold'
+            },
+            alternateRowStyles: { fillColor: [12, 8, 20] },
+            margin: { left: margin, right: margin },
+            theme: 'striped',
+            didDrawPage: (data) => {
+                // optional: could add footer
+            }
+        });
+    }
+
+    // After table, add totals & breakdown
+    const { byCategory, fullTotalINR } = computeSummaries(list);
+    const afterY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 12 : doc.internal.pageSize.getHeight() - 120;
+
+    doc.setFontSize(12);
+    doc.text('Summary', margin, afterY);
+    doc.setFontSize(10);
+
+    let summaryY = afterY + 16;
+    doc.text(`Total (all items): ${sym(currency)}${(fullTotalINR * (rates[currency] || 1)).toLocaleString()}`, margin, summaryY);
+    summaryY += 14;
+
+    // category breakdown
+    doc.text('By Category:', margin, summaryY);
+    summaryY += 12;
+
+    Object.keys(byCategory).forEach(cat => {
+        doc.text(`${cat}: ${sym(currency)}${(byCategory[cat] * (rates[currency] || 1)).toLocaleString()}`, margin + 10, summaryY);
+        summaryY += 12;
+    });
+
+    // Save file
+    doc.save(filename);
+}
+
+// Build Word (simple HTML -> .doc) - works with MS Word / LibreOffice
+function exportToWord() {
+    const filters = getExportFilters();
+    const list = filteredExpensesList(filters);
+
+    const uid = (window.currentUser && window.currentUser.uid) || 'anon';
+    const filename = `spendora-${uid}-${fmtDateForFile(new Date())}.doc`;
+
+    // Build HTML string for Word
+    let html = `
+  <!doctype html>
+  <html>
+  <head><meta charset="utf-8"><title>Spendora Report</title>
+    <style>
+      body { font-family: Arial, Helvetica, sans-serif; color:#111; }
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border: 1px solid #ddd; padding: 8px; }
+      th { background:#222; color:#fff; text-align:left; }
+    </style>
+  </head>
+  <body>
+  <h2>Spendora Expense Report</h2>
+  <p>Generated: ${new Date().toLocaleString()}</p>
+  <p>Filters: ${filters.category || 'All'}, ${filters.from || 'Any'} → ${filters.to || 'Any'}</p>
+  <table>
+    <thead>
+      <tr>
+        <th>Title</th><th>Category</th><th>Amount (${sym(currency)})</th>
+        <th>Date</th><th>CreatedAt</th><th>ID</th><th>Note</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+
+    list.forEach(it => {
+        const amt = (it.amount ? (Number(it.amount) * (rates[currency] || 1)).toFixed(2) : '0.00');
+        const createdAt = it.createdAt && it.createdAt.toDate ? it.createdAt.toDate().toISOString().slice(0, 19).replace('T', ' ') : (it.createdAt || '');
+        html += `<tr>
+      <td>${(it.title||'')}</td>
+      <td>${(it.category||'')}</td>
+      <td style="text-align:right">${amt}</td>
+      <td>${(it.date||'')}</td>
+      <td>${createdAt}</td>
+      <td>${(it.id||'')}</td>
+      <td>${(it.note ? 'Yes' : 'No')}</td>
+    </tr>`;
+    });
+
+    html += `</tbody></table>`;
+
+    // Totals
+    const { byCategory, fullTotalINR } = computeSummaries(list);
+    html += `<h3>Summary</h3><p>Total: ${sym(currency)}${(fullTotalINR * (rates[currency] || 1)).toLocaleString()}</p>`;
+    html += `<ul>`;
+    for (const c in byCategory) {
+        html += `<li>${c}: ${sym(currency)}${(byCategory[c] * (rates[currency] || 1)).toLocaleString()}</li>`;
+    }
+    html += `</ul>`;
+
+    html += `</body></html>`;
+
+    // Create blob and trigger download as .doc
+    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// Button hookup
+document.getElementById('btnExportPDF').addEventListener('click', exportToPDF);
+document.getElementById('btnExportWord').addEventListener('click', exportToWord);
+
+// Make these functions accessible if you need to call programmatically
+window.exportToPDF = exportToPDF;
+window.exportToWord = exportToWord;
