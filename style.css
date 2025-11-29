@@ -569,3 +569,66 @@ h2 {
 ::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #09e2ff, #ff3bd5);
 }
+
+
+/* ----- Total Expenditure Section ----- */
+
+.total-exp-card {
+    padding: 20px;
+    margin-bottom: 22px;
+}
+
+
+/* Buttons row */
+
+.total-toggle {
+    display: flex;
+    gap: 12px;
+    margin: 12px 0 18px;
+}
+
+
+/* Buttons */
+
+.toggle-btn {
+    flex: 1;
+    padding: 10px 0;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #00f0ff;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.toggle-btn.active {
+    background: linear-gradient(90deg, #00f0ff, #ff2ec4);
+    border: none;
+    color: #03111a;
+}
+
+
+/* Chart wrapper — controls internal height only */
+
+.total-chart-wrapper {
+    height: 150px !important;
+    position: relative;
+}
+
+
+/* Canvas actual size */
+
+#totalTrendChart {
+    height: 100% !important;
+    max-height: 150px !important;
+}
+
+
+/* Mobile Responsive */
+
+@media (max-width: 600px) {
+    .total-chart-wrapper {
+        height: 130px !important;
+    }
+}
