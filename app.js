@@ -579,3 +579,16 @@ window.googleLogin = async() => {
         alert(err.message || "Google Login Failed");
     }
 };
+// ========== Toast Function ==========
+window.showToast = function(msg, type = "normal") {
+    const box = document.getElementById("toastBox");
+    const div = document.createElement("div");
+    div.className = "toast" + (type === "error" ? " error" : "");
+    div.innerText = msg;
+
+    box.appendChild(div);
+
+    setTimeout(() => {
+        div.remove();
+    }, 3200);
+};

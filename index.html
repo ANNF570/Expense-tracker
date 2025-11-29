@@ -3,43 +3,93 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Neon Expense – Login</title>
+    <title>Spendora – Login</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="style.css">
 
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs (compat mode) -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* Extra styles only for password visibility */
+        
+        .password-wrapper {
+            position: relative;
+        }
+        
+        .toggle-pass {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            opacity: 0.75;
+            font-size: 18px;
+            user-select: none;
+        }
+        
+        .toggle-pass:hover {
+            opacity: 1;
+        }
+        /* Center logo above card */
+        
+        .logo-big {
+            width: 140px;
+            display: block;
+            margin: 0 auto 18px auto;
+            filter: drop-shadow(0 0 12px #00f0ff55);
+        }
+    </style>
 </head>
 
 <body>
     <div class="auth-wrap">
         <div class="card auth-card">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                <div>
-                    <h1>Neon Expense</h1>
-                    <div style="opacity:0.8;">Manage your expenses in real-time</div>
-                </div>
-                <div class="logo">ET</div>
-            </div>
 
-            <!-- LOGIN -->
+            <!-- OUR Spendora Logo -->
+            <img src="assets/full_logo.png" class="logo-big" alt="Spendora Logo">
+
+            <!-- LOGIN VIEW -->
             <div id="loginView">
+                <h1 style="text-align:center;margin-bottom:6px;">Spendora</h1>
+                <div style="opacity:0.8;text-align:center;margin-bottom:22px;">Smart Expense Tracking</div>
+
                 <input id="log-email" class="input" type="email" placeholder="Email">
-                <input id="log-pass" class="input" type="password" placeholder="Password">
+
+                <div class="password-wrapper">
+                    <input id="log-pass" class="input" type="password" placeholder="Password">
+                    <span class="toggle-pass" onclick="togglePassword('log-pass', this)">👁️</span>
+                </div>
+
                 <button class="btn" onclick="doLogin()">Login</button>
-                <div class="small">Create account? <a href="#" onclick="showSignup()">Signup</a></div>
+
+                <div class="small" style="margin-top:12px;">
+                    Create account? <a href="#" onclick="showSignup()">Signup</a>
+                </div>
             </div>
 
-            <!-- SIGNUP -->
+            <!-- SIGNUP VIEW -->
             <div id="signupView" style="display:none;">
+                <h1 style="text-align:center;margin-bottom:6px;">Spendora</h1>
+                <div style="opacity:0.8;text-align:center;margin-bottom:22px;">Create your account</div>
+
                 <input id="su-email" class="input" type="email" placeholder="Email">
-                <input id="su-pass" class="input" type="password" placeholder="Password (min 6)">
+
+                <div class="password-wrapper">
+                    <input id="su-pass" class="input" type="password" placeholder="Password (min 6)">
+                    <span class="toggle-pass" onclick="togglePassword('su-pass', this)">👁️</span>
+                </div>
+
                 <button class="btn" onclick="doSignup()">Signup</button>
-                <div class="small">Already have account? <a href="#" onclick="showLogin()">Login</a></div>
+
+                <div class="small" style="margin-top:12px;">
+                    Already have account? <a href="#" onclick="showLogin()">Login</a>
+                </div>
             </div>
-            <!-- google-->
+
+            <!-- Google Login -->
             <div class="google-btn" onclick="googleLogin()">
                 <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" style="width:22px;margin-right:8px;"> Continue with Google
             </div>
@@ -53,16 +103,31 @@
             apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
             authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
             projectId: "expense-tracker-akif-832fb",
-            storageBucket: "expense-tracker-akif-832fb.firebasestorage.app",
+            storageBucket: "expense-tracker-akif-832fb.appspot.com",
             messagingSenderId: "846826483222",
             appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37",
             measurementId: "G-ZSM3KCK8RF"
         };
+
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+
+        // Show / Hide Password
+        function togglePassword(id, el) {
+            const input = document.getElementById(id);
+
+            if (input.type === "password") {
+                input.type = "text";
+                el.textContent = "🙈";
+            } else {
+                input.type = "password";
+                el.textContent = "👁️";
+            }
+        }
     </script>
 
+    <!-- Main Logic -->
     <script src="app.js"></script>
 </body>
 

@@ -531,3 +531,41 @@ h2 {
         font-size: 14px;
     }
 }
+
+
+/* Hide scrollbar (but keep scroll functionality) */
+
+.expense-list::-webkit-scrollbar {
+    width: 0px;
+}
+
+.expense-list {
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE / Edge */
+}
+
+
+/* ===== Spendora Neon Scrollbar (Dark Version) ===== */
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgb(2, 19, 52);
+    /* 🔥 Dark glass black */
+    border-radius: 10px;
+    backdrop-filter: blur(4px);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00f0ff, #ff2ec4);
+    border-radius: 10px;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #09e2ff, #ff3bd5);
+}
