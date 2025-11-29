@@ -201,6 +201,75 @@ h2 {
 
 
 /* ======================================================
+   HEADER (Spendora) — NEW ADDED SECTION
+======================================================*/
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.app-logo {
+    width: 54px;
+    height: 54px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.06);
+    padding: 4px;
+}
+
+.app-title {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.app-sub {
+    opacity: 0.85;
+    font-size: 13px;
+}
+
+.right-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.user-email {
+    font-weight: 700;
+}
+
+
+/* NEON BUTTONS */
+
+.neon-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    background: linear-gradient(135deg, rgba(0, 240, 255, 0.25), rgba(255, 46, 196, 0.25));
+    color: white;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: 0.2s;
+}
+
+.neon-btn:hover {
+    box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
+    transform: translateY(-2px);
+}
+
+.neon-btn.danger {
+    background: linear-gradient(135deg, rgba(255, 46, 46, 0.3), rgba(255, 80, 120, 0.3));
+}
+
+.neon-btn.danger:hover {
+    box-shadow: 0 0 14px rgba(255, 46, 46, 0.5);
+}
+
+
+/* ======================================================
    CHARTS — FINAL CLEAN LAYOUT
 ======================================================*/
 
@@ -208,7 +277,6 @@ h2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    /* make gap bigger */
     margin-bottom: 24px;
 }
 
@@ -219,24 +287,16 @@ h2 {
     padding: 20px;
     border-radius: 12px;
     height: 380px;
-    /* bigger box */
     background: linear-gradient(180deg, rgba(0, 0, 0, 0.20), rgba(255, 255, 255, 0.03));
     border: 1px solid rgba(255, 255, 255, 0.05);
     position: relative;
     overflow: hidden;
 }
 
-
-/* Ensure canvas fits */
-
 .chart-card canvas {
     width: 100% !important;
     height: 100% !important;
-    display: block;
 }
-
-
-/* Bar chart bigger height */
 
 .chart-card.bar-box {
     height: 430px;
@@ -254,14 +314,32 @@ h2 {
     }
     .charts {
         grid-template-columns: 1fr;
-        gap: 20px;
     }
-    .chart-card {
-        height: 350px;
+    .right-controls {
+        flex-wrap: wrap;
+        justify-content: flex-end;
     }
-    .chart-card.bar-box {
-        height: 380px;
-    }
+}
+
+
+/* GOOGLE BUTTON */
+
+.google-btn {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    gap: 8px;
+    transition: 0.2s;
+}
+
+.google-btn:hover {
+    background: rgba(255, 255, 255, 0.22);
 }
 
 
@@ -270,33 +348,170 @@ h2 {
 ======================================================*/
 
 @media (max-width: 600px) {
-    .container {
-        padding: 8px;
-    }
     .header {
         flex-direction: column;
         align-items: flex-start;
+        gap: 18px;
     }
-    .app {
-        grid-template-columns: 1fr;
-        gap: 16px;
+    .right-controls {
+        width: 100%;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 10px;
     }
-    .charts {
-        grid-template-columns: 1fr;
-        gap: 16px;
+    .app-logo {
+        width: 42px;
+        height: 42px;
     }
-    .chart-card {
-        height: 300px !important;
+    .app-title {
+        font-size: 18px;
     }
-    .chart-card.bar-box {
-        height: 340px !important;
+}
+
+
+/* ======================================================
+   SPENDORA — DELETE MODAL (Neon Glass UI)
+======================================================*/
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
     }
-    .summary {
-        flex-direction: column;
+    to {
+        opacity: 1;
     }
-    .form-row {
-        flex-direction: column;
+}
+
+.modal-content {
+    width: 360px;
+    padding: 28px;
+    border-radius: 16px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.6);
+    animation: popIn 0.25s ease;
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
     }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.modal-content h2 {
+    margin: 0 0 10px;
+    color: var(--cyan);
+}
+
+.modal-content p {
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.btn-cancel {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.35);
+}
+
+.btn-delete {
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #ff3e89, #ff1e4d);
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-delete:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 12px rgba(255, 40, 100, 0.6);
+}
+
+
+/* ============================
+   DELETE CONFIRM MODAL
+============================ */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 5000;
+    backdrop-filter: blur(4px);
+}
+
+.modal-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 24px;
+    width: 320px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    text-align: center;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.25);
+}
+
+.modal-card h3 {
+    margin: 0 0 8px;
+}
+
+.modal-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.btn.cancel {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.btn.delete {
+    background: linear-gradient(90deg, #ff4d6d, #ff0a54);
 }
 
 
@@ -310,5 +525,9 @@ h2 {
     }
     .chart-card.bar-box {
         height: 300px !important;
+    }
+    .neon-btn {
+        padding: 8px 12px;
+        font-size: 14px;
     }
 }

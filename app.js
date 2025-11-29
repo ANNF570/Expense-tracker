@@ -202,19 +202,54 @@ if (window.location.pathname.endsWith("dashboard.html")) {
             });
     };
 
-    /* ======================
-       Delete Expense
-    ====================== */
-    window.deleteExpense = async(id) => {
-        if (!confirm("Delete this?")) return;
+    /* ======================================================
+       CUSTOM DELETE MODAL — FIXED (buttons now work)
+    ======================================================*/
+    let deleteID = null;
 
-        await firebase
-            .firestore()
-            .collection("users")
-            .doc(currentUser.uid)
-            .collection("expenses")
-            .doc(id)
-            .delete();
+    // this runs AFTER the page & user loads
+    setTimeout(() => {
+        const modal = document.getElementById("deleteModal");
+        const cancelBtn = document.getElementById("cancelDelete");
+        const confirmBtn = document.getElementById("confirmDelete");
+
+        if (!modal || !cancelBtn || !confirmBtn) {
+            console.warn("Modal elements not found yet.");
+            return;
+        }
+
+        console.log("Delete modal buttons linked ✔");
+
+        // CANCEL BUTTON
+        cancelBtn.onclick = () => {
+            deleteID = null;
+            modal.style.display = "none";
+        };
+
+        // CONFIRM DELETE BUTTON
+        confirmBtn.onclick = async() => {
+            if (!deleteID) return;
+
+            await firebase
+                .firestore()
+                .collection("users")
+                .doc(currentUser.uid)
+                .collection("expenses")
+                .doc(deleteID)
+                .delete();
+
+            deleteID = null;
+            modal.style.display = "none";
+        };
+
+    }, 500); // wait for UI to load fully
+
+
+    // called when user clicks delete icon
+    window.deleteExpense = (id) => {
+        deleteID = id;
+        const modal = document.getElementById("deleteModal");
+        modal.style.display = "flex";
     };
 
     /* ======================
@@ -517,4 +552,30 @@ window.exportUserData = window.exportUserData || function() {
 };
 window.importUserData = window.importUserData || function() {
     alert("No user loaded");
+};
+window.googleLogin = async() => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    try {
+        const res = await firebase.auth().signInWithPopup(provider);
+        const user = res.user;
+
+        // Create firestore user doc if not exists
+        const ref = firebase.firestore().collection("users").doc(user.uid);
+        const doc = await ref.get();
+
+        if (!doc.exists) {
+            await ref.set({
+                email: user.email,
+                name: user.displayName || "",
+                photo: user.photoURL || "",
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        window.location.href = "dashboard.html";
+
+    } catch (err) {
+        alert(err.message || "Google Login Failed");
+    }
 };

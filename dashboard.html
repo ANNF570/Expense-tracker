@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Neon Expense – Dashboard</title>
+    <title>Expense Tracker – Dashboard</title>
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="style.css">
 
@@ -21,27 +21,37 @@
 
         <!-- HEADER -->
         <div class="card header">
+
+            <!-- LEFT: BRAND LOGO + NAME -->
             <div class="brand">
-                <div class="logo">ET</div>
+                <img src="assets/only_logo.png" class="app-logo" alt="Spendora Logo" />
+
                 <div>
-                    <div style="font-weight:800;">Neon Expense</div>
-                    <div style="opacity:0.85;font-size:13px;">Real-time dashboard</div>
+                    <div class="app-title">Spendora</div>
+                    <div class="app-sub">Real-time dashboard</div>
                 </div>
             </div>
 
-            <div class="top-controls">
+            <!-- RIGHT SIDE -->
+            <div class="right-controls">
+
+                <!-- Currency -->
                 <select id="currency" class="select" onchange="setCurrency(this.value)">
-          <option value="INR">₹ INR</option>
-          <option value="USD">$ USD</option>
-          <option value="EUR">€ EUR</option>
+            <option value="INR">₹ INR</option>
+            <option value="USD">$ USD</option>
+            <option value="EUR">€ EUR</option>
         </select>
 
-                <div style="text-align:right;">
-                    <div id="userEmail" style="font-weight:700"></div>
-                    <button class="btn" style="padding:8px 12px;" onclick="signOut()">Logout</button>
-                </div>
+                <!-- User Email -->
+                <span id="userEmail" class="user-email"></span>
+
+                <!-- Neon Buttons -->
+                <button class="neon-btn" onclick="location.href='profile.html'">Profile</button>
+                <button class="neon-btn danger" onclick="signOut()">Logout</button>
+
             </div>
         </div>
+
 
         <div class="app">
 
@@ -137,6 +147,21 @@
     </script>
 
     <script src="app.js"></script>
+    <!-- ============================
+     SPENDORA DELETE MODAL
+============================= -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h2>Delete Expense?</h2>
+            <p>This action cannot be undone.</p>
+
+            <div class="modal-actions">
+                <button id="cancelDelete" class="btn-cancel">Cancel</button>
+                <button id="confirmDelete" class="btn-delete">Delete</button>
+            </div>
+        </div>
+    </div>
+
 </body>
 
 </html>

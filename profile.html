@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Spendora — Profile</title>
+
+    <!-- Firebase v8 (namespaced) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
+    <style>
+         :root {
+            --bg: linear-gradient(135deg, #050308 0%, #0b0630 60%);
+            --cyan: #00f0ff;
+            --pink: #ff2ec4;
+            --card: rgba(255, 255, 255, 0.03);
+            --radius: 14px;
+            color-scheme: dark;
+        }
+        
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            background: var(--bg);
+            font-family: Inter, system-ui, Arial;
+            color: #eaf7ff;
+        }
+        
+        .container {
+            max-width: 820px;
+            margin: 36px auto;
+            padding: 18px
+        }
+        
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+            border-radius: var(--radius);
+            padding: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(8px);
+        }
+        
+        h1 {
+            margin: 0 0 20px;
+            text-align: center
+        }
+        
+        .row {
+            display: flex;
+            gap: 16px;
+            align-items: center
+        }
+        
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--cyan);
+            display: block
+        }
+        
+        .left-col {
+            flex: 0 0 140px;
+            text-align: center
+        }
+        
+        .right-col {
+            flex: 1
+        }
+        
+        .input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: rgba(0, 0, 0, 0.28);
+            color: #eaf7ff;
+            margin-bottom: 12px
+        }
+        
+        .textarea {
+            height: 90px;
+            padding: 12px;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.28);
+            color: #eaf7ff;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            resize: vertical
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            margin-top: 8px;
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
+            color: #03111a;
+            font-weight: 700
+        }
+        
+        .small-link {
+            display: block;
+            text-align: center;
+            color: var(--cyan);
+            margin-top: 12px
+        }
+        
+        .flex-row {
+            display: flex;
+            gap: 12px
+        }
+        
+        .icon-btn {
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.02);
+            color: #eaf7ff;
+            cursor: pointer
+        }
+        
+        @media (max-width:720px) {
+            .row {
+                flex-direction: column;
+                align-items: stretch
+            }
+            .left-col {
+                flex: unset
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Edit Profile</h1>
+
+            <div class="row" style="margin-top:12px">
+                <div class="left-col">
+                    <img id="profilePic" class="profile-pic" src="https://i.imgur.com/4ZQZ4ZC.png" alt="profile">
+                    <input id="picInput" type="file" accept="image/*" style="display:none" />
+                    <button class="btn" id="changePicBtn">Change Picture</button>
+                    <button class="btn" id="removePicBtn" style="background:#ff4e66;margin-top:10px">Remove Picture</button>
+                </div>
+
+                <div class="right-col">
+                    <input id="profileName" class="input" placeholder="Full name" />
+                    <input id="profileEmail" class="input" placeholder="Email" readonly />
+                    <input id="profilePhone" class="input" placeholder="Phone number" />
+
+                    <div class="flex-row">
+                        <select id="profileGender" class="input" style="flex:1;">
+              <option value="">Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+
+                        <input id="profileDob" type="date" class="input" style="flex:1" />
+                    </div>
+
+                    <textarea id="profileBio" class="textarea" placeholder="Write a short bio..."></textarea>
+
+                    <button id="saveProfileBtn" class="btn">Save Profile</button>
+
+                    <a class="small-link" href="dashboard.html">⬅ Back to Dashboard</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase config (same as your other pages)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
+            authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
+            projectId: "expense-tracker-akif-832fb",
+            storageBucket: "expense-tracker-akif-832fb.appspot.com",
+            messagingSenderId: "846826483222",
+            appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37",
+            measurementId: "G-ZSM3KCK8RF"
+        };
+
+        // initialize only if not already
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        const profilePicEl = document.getElementById('profilePic');
+        const picInput = document.getElementById('picInput');
+        const changePicBtn = document.getElementById('changePicBtn');
+        const removePicBtn = document.getElementById('removePicBtn');
+
+        // Wait for auth state
+        auth.onAuthStateChanged(async user => {
+            if (!user) {
+                // not logged in -> redirect to login
+                return window.location.href = "index.html";
+            }
+
+            // fill email and initial fields
+            document.getElementById('profileEmail').value = user.email || "";
+
+            // show photoURL if present
+            if (user.photoURL) profilePicEl.src = user.photoURL;
+
+            // load user doc from Firestore
+            try {
+                const docRef = db.collection('users').doc(user.uid);
+                const snap = await docRef.get();
+                if (snap.exists) {
+                    const data = snap.data();
+                    document.getElementById('profileName').value = data.name || user.displayName || "";
+                    document.getElementById('profilePhone').value = data.phone || "";
+                    document.getElementById('profileGender').value = data.gender || "";
+                    document.getElementById('profileDob').value = data.dob || "";
+                    document.getElementById('profileBio').value = data.bio || "";
+                    // If Firestore has photo (stored separately) prefer it
+                    if (data.photo) profilePicEl.src = data.photo;
+                } else {
+                    // If no doc yet, prefill name from auth
+                    document.getElementById('profileName').value = user.displayName || "";
+                }
+            } catch (err) {
+                console.error("Load profile error:", err);
+            }
+        });
+
+        // Save profile: update Firestore and updateAuth displayName
+        document.getElementById('saveProfileBtn').addEventListener('click', async() => {
+            const user = auth.currentUser;
+            if (!user) return alert("No user logged in");
+
+            const uid = user.uid;
+            const data = {
+                name: document.getElementById('profileName').value.trim(),
+                email: document.getElementById('profileEmail').value,
+                phone: document.getElementById('profilePhone').value.trim(),
+                gender: document.getElementById('profileGender').value,
+                dob: document.getElementById('profileDob').value,
+                bio: document.getElementById('profileBio').value.trim(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            try {
+                // update firestore
+                await db.collection('users').doc(uid).set(data, {
+                    merge: true
+                });
+
+                // update displayName in Auth (optional)
+                if (data.name && user.displayName !== data.name) {
+                    await user.updateProfile({
+                        displayName: data.name
+                    });
+                }
+
+                alert("Profile saved successfully");
+            } catch (err) {
+                console.error("Save profile error:", err);
+                alert("Error saving profile: " + (err.message || err));
+            }
+        });
+
+        // Change picture flow
+        changePicBtn.addEventListener('click', () => picInput.click());
+
+        picInput.addEventListener('change', async(e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const user = auth.currentUser;
+            if (!user) return alert("Not signed in");
+
+            const uid = user.uid;
+            const ref = storage.ref().child(`profilePics/${uid}.jpg`);
+
+            try {
+                // upload
+                const task = await ref.put(file);
+                const url = await ref.getDownloadURL();
+
+                // set both auth photo and firestore field
+                await user.updateProfile({
+                    photoURL: url
+                });
+                await db.collection('users').doc(uid).set({
+                    photo: url,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, {
+                    merge: true
+                });
+
+                profilePicEl.src = url;
+                alert("Profile picture updated");
+            } catch (err) {
+                console.error("Upload pic error:", err);
+                alert("Upload failed: " + (err.message || err));
+            }
+        });
+
+        // Remove picture (reset to default)
+        removePicBtn.addEventListener('click', async() => {
+            if (!confirm("Remove profile picture?")) return;
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const uid = user.uid;
+            // attempt to delete storage file (ignore errors)
+            storage.ref().child(`profilePics/${uid}.jpg`).delete().catch(() => {});
+            // update auth and firestore
+            await user.updateProfile({
+                photoURL: null
+            });
+            await db.collection('users').doc(uid).set({
+                photo: firebase.firestore.FieldValue.delete(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, {
+                merge: true
+            });
+            profilePicEl.src = "https://i.imgur.com/4ZQZ4ZC.png";
+            alert("Profile picture removed");
+        });
+    </script>
+</body>
+
+</html>
