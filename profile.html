@@ -14,7 +14,7 @@
 
     <style>
          :root {
-            --bg: linear-gradient(135deg, #050308 0%, #0b0630 60%);
+            --bg: #050308;
             --cyan: #00f0ff;
             --pink: #ff2ec4;
             --card: rgba(255, 255, 255, 0.03);
@@ -22,12 +22,10 @@
             color-scheme: dark;
         }
         
-        html,
         body {
-            height: 100%;
             margin: 0;
-            background: var(--bg);
-            font-family: Inter, system-ui, Arial;
+            background: linear-gradient(135deg, #050308 0%, #0b0630 60%);
+            font-family: Inter, system-ui;
             color: #eaf7ff;
         }
         
@@ -47,47 +45,49 @@
         
         h1 {
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 22px;
         }
         
         .row {
             display: flex;
-            gap: 16px;
-            align-items: center;
+            gap: 22px;
         }
         
         .left-col {
-            flex: 0 0 150px;
+            flex: 0 0 160px;
             text-align: center;
         }
         
+        .right-col {
+            flex: 1;
+        }
+        
         .profile-pic {
-            width: 120px;
-            height: 120px;
+            width: 125px;
+            height: 125px;
             border-radius: 50%;
             border: 3px solid var(--cyan);
             object-fit: cover;
         }
         
-        .input,
-        select.input {
+        .input {
             width: 100%;
             padding: 12px;
+            margin-bottom: 12px;
             border-radius: 10px;
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: #eaf7ff;
-            margin-bottom: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(0, 0, 0, 0.25);
+            color: white;
         }
         
         .textarea {
             width: 100%;
-            padding: 12px;
             min-height: 90px;
+            padding: 12px;
             border-radius: 10px;
-            background: rgba(0, 0, 0, 0.28);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: #eaf7ff;
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: white;
         }
         
         .btn {
@@ -95,28 +95,44 @@
             width: 100%;
             border: none;
             border-radius: 10px;
-            font-weight: 700;
-            cursor: pointer;
             margin-top: 10px;
+            font-weight: 700;
             background: linear-gradient(90deg, var(--cyan), var(--pink));
+            cursor: pointer;
             color: #03111a;
         }
         
         .danger-btn {
-            padding: 10px;
+            padding: 12px;
             width: 100%;
             border: none;
             border-radius: 10px;
             background: #ff4e66;
+            color: white;
             font-weight: 700;
             cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .pass-wrap {
+            position: relative;
+        }
+        
+        .toggle-eye {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 17px;
+            opacity: 0.8;
         }
         
         .back-link {
             display: block;
+            margin-top: 14px;
             text-align: center;
             color: var(--cyan);
-            margin-top: 16px;
         }
         /* Toast */
         
@@ -135,70 +151,93 @@
             background: rgba(0, 0, 0, 0.75);
             border-left: 4px solid var(--cyan);
             border-radius: 8px;
-            animation: slideIn .3s ease, fadeOut .5s ease 2.5s forwards;
+            animation: fadeOut 3s forwards;
         }
         
         .toast.error {
             border-left-color: #ff4e4e;
         }
         
-        @keyframes slideIn {
-            from {
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
                 opacity: 0;
                 transform: translateX(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                transform: translateX(30px);
             }
         }
         
         @media(max-width:700px) {
             .row {
                 flex-direction: column;
+                text-align: center;
             }
         }
     </style>
+
 </head>
 
 <body>
+
     <div class="container">
         <div class="card">
             <h1>Edit Profile</h1>
 
             <div class="row">
+                <!-- LEFT -->
                 <div class="left-col">
                     <img id="profilePic" class="profile-pic" src="https://i.imgur.com/4ZQZ4ZC.png">
                     <input id="picInput" type="file" accept="image/*" style="display:none">
+
                     <button id="changePicBtn" class="btn">Change Picture</button>
                     <button id="removePicBtn" class="danger-btn">Remove Picture</button>
                 </div>
 
-                <div class="right-col" style="flex:1">
+                <!-- RIGHT -->
+                <div class="right-col">
                     <input id="profileName" class="input" placeholder="Full Name">
                     <input id="profileEmail" class="input" readonly>
-
                     <input id="profilePhone" class="input" placeholder="Phone">
 
                     <div style="display:flex; gap:12px;">
                         <select id="profileGender" class="input">
-                <option value="">Select gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
-                <option value="Other">Other</option>
-            </select>
+                            <option value="">Select gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
 
-                        <input id="profileDob" type="date" class="input">
+                        <input id="profileDob" class="input" type="date">
                     </div>
 
                     <textarea id="profileBio" class="textarea" placeholder="Write a short bio..."></textarea>
+
+                    <hr style="margin:25px 0;border-color:rgba(255,255,255,0.1);">
+
+                    <h2 style="margin-bottom:15px;">Change Password</h2>
+
+                    <div class="pass-wrap">
+                        <input id="oldPass" type="password" class="input" placeholder="Current password">
+                        <span class="toggle-eye" onclick="togglePass('oldPass', this)">👁️</span>
+                    </div>
+
+                    <div class="pass-wrap">
+                        <input id="newPass" type="password" class="input" placeholder="New password (min 6)">
+                        <span class="toggle-eye" onclick="togglePass('newPass', this)">👁️</span>
+                    </div>
+
+                    <div class="pass-wrap">
+                        <input id="confirmPass" type="password" class="input" placeholder="Confirm new password">
+                        <span class="toggle-eye" onclick="togglePass('confirmPass', this)">👁️</span>
+                    </div>
+
+                    <button id="changePassBtn" class="btn" style="background:linear-gradient(90deg,#ff9a9e,#ff2ec4);">
+                        Update Password
+                    </button>
 
                     <button id="saveProfileBtn" class="btn">Save Profile</button>
 
@@ -211,7 +250,7 @@
     <div id="toastBox"></div>
 
     <script>
-        /* Firebase */
+        /* Firebase Init */
         const firebaseConfig = {
             apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
             authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
@@ -228,22 +267,41 @@
         const storage = firebase.storage();
 
         /* Toast */
-        function showToast(msg, type = "normal") {
-            const box = document.getElementById("toastBox");
-            const t = document.createElement("div");
-            t.className = "toast" + (type === "error" ? " error" : "");
+        function toast(msg, error = false) {
+            let box = document.getElementById("toastBox");
+            let t = document.createElement("div");
+            t.className = "toast" + (error ? " error" : "");
             t.innerHTML = msg;
             box.appendChild(t);
             setTimeout(() => t.remove(), 3000);
         }
 
-        /* Load profile */
+        /* Show/Hide Password */
+        function togglePass(id, icon) {
+            let input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
+                icon.style.opacity = 1;
+            } else {
+                input.type = "password";
+                icon.style.opacity = 0.7;
+            }
+        }
+
+        /* Load Profile */
         auth.onAuthStateChanged(async user => {
             if (!user) return location.href = "index.html";
 
-            document.getElementById("profileEmail").value = user.email || "";
+            profileEmail.value = user.email || "";
+            if (user.photoURL) profilePic.src = user.photoURL;
 
-            if (user.photoURL) document.getElementById("profilePic").src = user.photoURL;
+            // Hide password fields for Google users
+            if (user.providerData[0].providerId === "google.com") {
+                document.getElementById("changePassBtn").style.display = "none";
+                oldPass.parentElement.style.display = "none";
+                newPass.parentElement.style.display = "none";
+                confirmPass.parentElement.style.display = "none";
+            }
 
             const snap = await db.collection("users").doc(user.uid).get();
             if (snap.exists) {
@@ -257,39 +315,61 @@
             }
         });
 
-        /* Save profile */
+        /* Save Profile */
         saveProfileBtn.addEventListener("click", async() => {
             const user = auth.currentUser;
-            if (!user) return showToast("Not logged in", "error");
-
-            const uid = user.uid;
-            const data = {
-                name: profileName.value.trim(),
-                phone: profilePhone.value.trim(),
-                gender: profileGender.value,
-                dob: profileDob.value,
-                bio: profileBio.value.trim(),
-                email: user.email,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
+            if (!user) return toast("Not logged in", true);
 
             try {
-                await db.collection("users").doc(uid).set(data, {
+                await db.collection("users").doc(user.uid).set({
+                    name: profileName.value.trim(),
+                    phone: profilePhone.value.trim(),
+                    gender: profileGender.value,
+                    dob: profileDob.value,
+                    bio: profileBio.value.trim(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, {
                     merge: true
                 });
+
                 await user.updateProfile({
-                    displayName: data.name
+                    displayName: profileName.value.trim()
                 });
-                showToast("Profile updated successfully!");
+                toast("Profile updated!");
             } catch (e) {
-                showToast("Error: " + e.message, "error");
+                toast("Error: " + e.message, true);
             }
         });
 
-        /* Change picture */
+        /* Change Password (Email users only) */
+        changePassBtn.addEventListener("click", async() => {
+            const user = auth.currentUser;
+            if (!user) return toast("Not logged in", true);
+
+            const oldPass = oldPass.value.trim();
+            const newPass = newPass.value.trim();
+            const confirm = confirmPass.value.trim();
+
+            if (!oldPass || !newPass || !confirm)
+                return toast("Fill all fields", true);
+
+            if (newPass !== confirm)
+                return toast("Passwords do not match", true);
+
+            try {
+                const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
+                await user.reauthenticateWithCredential(cred);
+                await user.updatePassword(newPass);
+                toast("Password updated!");
+            } catch (e) {
+                toast(e.message, true);
+            }
+        });
+
+        /* Upload Picture */
         changePicBtn.addEventListener("click", () => picInput.click());
 
-        picInput.addEventListener("change", async(e) => {
+        picInput.addEventListener("change", async e => {
             const file = e.target.files[0];
             if (!file) return;
 
@@ -311,19 +391,19 @@
                 });
 
                 profilePic.src = url;
-                showToast("Profile picture updated!");
-            } catch (e) {
-                showToast("Upload failed: " + e.message, "error");
+                toast("Picture updated!");
+            } catch (err) {
+                toast("Upload failed", true);
             }
         });
 
-        /* Remove picture */
+        /* Remove Picture */
         removePicBtn.addEventListener("click", async() => {
             const user = auth.currentUser;
             if (!user) return;
 
             try {
-                storage.ref(`profilePics/${user.uid}.jpg`).delete().catch(() => {});
+                await storage.ref(`profilePics/${user.uid}.jpg`).delete().catch(() => {});
                 await user.updateProfile({
                     photoURL: null
                 });
@@ -334,9 +414,9 @@
                 });
 
                 profilePic.src = "https://i.imgur.com/4ZQZ4ZC.png";
-                showToast("Picture removed!");
-            } catch (e) {
-                showToast("Error removing: " + e.message, "error");
+                toast("Picture removed!");
+            } catch (err) {
+                toast("Error removing picture", true);
             }
         });
     </script>
