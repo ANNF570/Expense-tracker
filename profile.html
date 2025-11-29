@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 
 <head>
@@ -12,32 +12,34 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
+    <!-- CropperJS -->
+    <link href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css" rel="stylesheet" />
+    <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
+
     <style>
          :root {
-            --bg: #050308;
+            --bg: linear-gradient(135deg, #050308 0%, #0b0630 60%);
             --cyan: #00f0ff;
             --pink: #ff2ec4;
             --card: rgba(255, 255, 255, 0.03);
-            --radius: 14px;
-            color-scheme: dark;
         }
         
         body {
             margin: 0;
-            background: linear-gradient(135deg, #050308 0%, #0b0630 60%);
+            background: var(--bg);
             font-family: Inter, system-ui;
             color: #eaf7ff;
         }
         
         .container {
-            max-width: 820px;
-            margin: 36px auto;
-            padding: 18px;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 16px;
         }
         
         .card {
             background: var(--card);
-            border-radius: var(--radius);
+            border-radius: 14px;
             padding: 28px;
             border: 1px solid rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -45,16 +47,16 @@
         
         h1 {
             text-align: center;
-            margin-bottom: 22px;
+            margin-bottom: 18px;
         }
         
         .row {
             display: flex;
-            gap: 22px;
+            gap: 20px;
         }
         
         .left-col {
-            flex: 0 0 160px;
+            flex: 0 0 170px;
             text-align: center;
         }
         
@@ -63,10 +65,10 @@
         }
         
         .profile-pic {
-            width: 125px;
-            height: 125px;
+            width: 135px;
+            height: 135px;
             border-radius: 50%;
-            border: 3px solid var(--cyan);
+            border: 4px solid var(--cyan);
             object-fit: cover;
         }
         
@@ -77,7 +79,7 @@
             border-radius: 10px;
             border: 1px solid rgba(255, 255, 255, 0.07);
             background: rgba(0, 0, 0, 0.25);
-            color: white;
+            color: #eaf7ff;
         }
         
         .textarea {
@@ -91,27 +93,27 @@
         }
         
         .btn {
-            padding: 12px;
             width: 100%;
+            padding: 12px;
             border: none;
             border-radius: 10px;
-            margin-top: 10px;
             font-weight: 700;
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
             cursor: pointer;
+            margin-top: 10px;
+            background: linear-gradient(90deg, var(--cyan), var(--pink));
             color: #03111a;
         }
         
         .danger-btn {
-            padding: 12px;
             width: 100%;
+            padding: 12px;
+            background: #ff4e66;
             border: none;
             border-radius: 10px;
-            background: #ff4e66;
             color: white;
             font-weight: 700;
-            cursor: pointer;
             margin-top: 10px;
+            cursor: pointer;
         }
         
         .pass-wrap {
@@ -124,22 +126,14 @@
             top: 50%;
             transform: translateY(-50%);
             cursor: pointer;
-            font-size: 17px;
-            opacity: 0.8;
-        }
-        
-        .back-link {
-            display: block;
-            margin-top: 14px;
-            text-align: center;
-            color: var(--cyan);
+            opacity: .85;
         }
         /* Toast */
         
         #toastBox {
             position: fixed;
-            bottom: 26px;
-            right: 26px;
+            bottom: 25px;
+            right: 25px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -151,34 +145,46 @@
             background: rgba(0, 0, 0, 0.75);
             border-left: 4px solid var(--cyan);
             border-radius: 8px;
-            animation: fadeOut 3s forwards;
         }
         
         .toast.error {
             border-left-color: #ff4e4e;
         }
+        /* Crop Modal */
         
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-            80% {
-                opacity: 1;
-            }
-            100% {
-                opacity: 0;
-                transform: translateX(40px);
-            }
+        .crop-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+            z-index: 2000;
         }
         
-        @media(max-width:700px) {
-            .row {
-                flex-direction: column;
-                text-align: center;
-            }
+        .crop-modal.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .crop-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .crop-preview {
+            max-width: 450px;
+            max-height: 450px;
+            overflow: hidden;
+            background: #111;
+            border-radius: 8px;
         }
     </style>
-
 </head>
 
 <body>
@@ -192,58 +198,81 @@
                 <div class="left-col">
                     <img id="profilePic" class="profile-pic" src="https://i.imgur.com/4ZQZ4ZC.png">
                     <input id="picInput" type="file" accept="image/*" style="display:none">
-
                     <button id="changePicBtn" class="btn">Change Picture</button>
                     <button id="removePicBtn" class="danger-btn">Remove Picture</button>
                 </div>
 
                 <!-- RIGHT -->
                 <div class="right-col">
-                    <input id="profileName" class="input" placeholder="Full Name">
+
+                    <input id="profileName" class="input" placeholder="Full name">
                     <input id="profileEmail" class="input" readonly>
                     <input id="profilePhone" class="input" placeholder="Phone">
 
                     <div style="display:flex; gap:12px;">
                         <select id="profileGender" class="input">
-                            <option value="">Select gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
+                            <option value="">Gender</option>
+                            <option>Male</option>
+                            <option>Female</option>
+                            <option>Other</option>
                         </select>
 
-                        <input id="profileDob" class="input" type="date">
+                        <input id="profileDob" type="date" class="input">
                     </div>
 
-                    <textarea id="profileBio" class="textarea" placeholder="Write a short bio..."></textarea>
+                    <textarea id="profileBio" class="textarea" placeholder="Short bio..."></textarea>
 
-                    <hr style="margin:25px 0;border-color:rgba(255,255,255,0.1);">
+                    <hr style="margin:22px 0; border-color:rgba(255,255,255,0.08)">
 
-                    <h2 style="margin-bottom:15px;">Change Password</h2>
-
-                    <div class="pass-wrap">
-                        <input id="oldPass" type="password" class="input" placeholder="Current password">
-                        <span class="toggle-eye" onclick="togglePass('oldPass', this)">👁️</span>
-                    </div>
+                    <h2 style="margin:0 0 12px;">Change Password</h2>
 
                     <div class="pass-wrap">
-                        <input id="newPass" type="password" class="input" placeholder="New password (min 6)">
-                        <span class="toggle-eye" onclick="togglePass('newPass', this)">👁️</span>
+                        <input id="oldPass" class="input" type="password" placeholder="Current password">
+                        <span class="toggle-eye" onclick="togglePass('oldPass',this)">👁️</span>
                     </div>
 
                     <div class="pass-wrap">
-                        <input id="confirmPass" type="password" class="input" placeholder="Confirm new password">
-                        <span class="toggle-eye" onclick="togglePass('confirmPass', this)">👁️</span>
+                        <input id="newPass" class="input" type="password" placeholder="New password (min 6)">
+                        <span class="toggle-eye" onclick="togglePass('newPass',this)">👁️</span>
                     </div>
 
-                    <button id="changePassBtn" class="btn" style="background:linear-gradient(90deg,#ff9a9e,#ff2ec4);">
+                    <div class="pass-wrap">
+                        <input id="confirmPass" class="input" type="password" placeholder="Confirm new password">
+                        <span class="toggle-eye" onclick="togglePass('confirmPass',this)">👁️</span>
+                    </div>
+
+                    <button id="changePassBtn" class="btn" style="background:linear-gradient(90deg,#ff9a9e,#ff2ec4)">
                         Update Password
                     </button>
 
                     <button id="saveProfileBtn" class="btn">Save Profile</button>
 
-                    <a href="dashboard.html" class="back-link">⬅ Back to Dashboard</a>
+                    <a href="dashboard.html" style="color:var(--cyan); display:block; margin-top:10px;">⬅ Back to Dashboard</a>
+
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Crop Modal -->
+    <div id="cropModal" class="crop-modal">
+        <div class="crop-card">
+
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <strong>Crop & Upload Picture</strong>
+                <button id="cropClose" style="background:none;border:none;color:white;cursor:pointer;font-size:20px;">✕</button>
+            </div>
+
+            <div class="crop-preview">
+                <img id="cropImage" style="max-width:100%">
+            </div>
+
+            <div style="display:flex; gap:12px; margin-top:12px;">
+                <button id="cropRotate" class="btn" style="background:#222;color:var(--cyan)">Rotate</button>
+                <button id="cropReset" class="btn" style="background:#222;color:var(--cyan)">Reset</button>
+                <button id="cropUpload" class="btn">Crop & Upload</button>
+            </div>
+
         </div>
     </div>
 
@@ -259,53 +288,36 @@
             messagingSenderId: "846826483222",
             appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37"
         };
-
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
 
         const auth = firebase.auth();
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        /* Toast */
-        function toast(msg, error = false) {
-            let box = document.getElementById("toastBox");
-            let t = document.createElement("div");
-            t.className = "toast" + (error ? " error" : "");
-            t.innerHTML = msg;
-            box.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+        function toast(msg, err = false) {
+            const box = document.getElementById('toastBox');
+            const el = document.createElement('div');
+            el.className = 'toast' + (err ? ' error' : '');
+            el.textContent = msg;
+            box.appendChild(el);
+            setTimeout(() => el.remove(), 3000);
         }
 
-        /* Show/Hide Password */
         function togglePass(id, icon) {
-            let input = document.getElementById(id);
-            if (input.type === "password") {
-                input.type = "text";
-                icon.style.opacity = 1;
-            } else {
-                input.type = "password";
-                icon.style.opacity = 0.7;
-            }
+            const inp = document.getElementById(id);
+            inp.type = inp.type === "password" ? "text" : "password";
         }
 
-        /* Load Profile */
+        /* Load profile */
         auth.onAuthStateChanged(async user => {
             if (!user) return location.href = "index.html";
 
-            profileEmail.value = user.email || "";
-            if (user.photoURL) profilePic.src = user.photoURL;
-
-            // Hide password fields for Google users
-            if (user.providerData[0].providerId === "google.com") {
-                document.getElementById("changePassBtn").style.display = "none";
-                oldPass.parentElement.style.display = "none";
-                newPass.parentElement.style.display = "none";
-                confirmPass.parentElement.style.display = "none";
-            }
+            document.getElementById("profileEmail").value = user.email;
+            if (user.photoURL) document.getElementById("profilePic").src = user.photoURL;
 
             const snap = await db.collection("users").doc(user.uid).get();
             if (snap.exists) {
-                let d = snap.data();
+                const d = snap.data();
                 profileName.value = d.name || "";
                 profilePhone.value = d.phone || "";
                 profileGender.value = d.gender || "";
@@ -313,72 +325,109 @@
                 profileBio.value = d.bio || "";
                 if (d.photo) profilePic.src = d.photo;
             }
+
+            if (user.providerData[0].providerId === "google.com") {
+                oldPass.closest('.pass-wrap').style.display = "none";
+                newPass.closest('.pass-wrap').style.display = "none";
+                confirmPass.closest('.pass-wrap').style.display = "none";
+                changePassBtn.style.display = "none";
+            }
         });
 
-        /* Save Profile */
+        /* Save profile */
         saveProfileBtn.addEventListener("click", async() => {
             const user = auth.currentUser;
             if (!user) return toast("Not logged in", true);
 
-            try {
-                await db.collection("users").doc(user.uid).set({
-                    name: profileName.value.trim(),
-                    phone: profilePhone.value.trim(),
-                    gender: profileGender.value,
-                    dob: profileDob.value,
-                    bio: profileBio.value.trim(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, {
-                    merge: true
-                });
+            const data = {
+                name: profileName.value.trim(),
+                phone: profilePhone.value.trim(),
+                gender: profileGender.value,
+                dob: profileDob.value,
+                bio: profileBio.value.trim(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
 
-                await user.updateProfile({
-                    displayName: profileName.value.trim()
-                });
-                toast("Profile updated!");
-            } catch (e) {
-                toast("Error: " + e.message, true);
-            }
+            await db.collection("users").doc(user.uid).set(data, {
+                merge: true
+            });
+            await user.updateProfile({
+                displayName: data.name
+            });
+
+            toast("Profile updated!");
         });
 
-        /* Change Password (Email users only) */
+        /* Change Password */
         changePassBtn.addEventListener("click", async() => {
             const user = auth.currentUser;
-            if (!user) return toast("Not logged in", true);
+            const oldP = oldPass.value.trim();
+            const newP = newPass.value.trim();
+            const confP = confirmPass.value.trim();
 
-            const oldPass = oldPass.value.trim();
-            const newPass = newPass.value.trim();
-            const confirm = confirmPass.value.trim();
-
-            if (!oldPass || !newPass || !confirm)
-                return toast("Fill all fields", true);
-
-            if (newPass !== confirm)
-                return toast("Passwords do not match", true);
+            if (!oldP || !newP || !confP) return toast("Fill all fields", true);
+            if (newP !== confP) return toast("Passwords do not match", true);
+            if (newP.length < 6) return toast("Password must be 6+ chars", true);
 
             try {
-                const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldPass);
+                const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldP);
                 await user.reauthenticateWithCredential(cred);
-                await user.updatePassword(newPass);
-                toast("Password updated!");
+                await user.updatePassword(newP);
+
+                oldPass.value = newPass.value = confirmPass.value = "";
+                toast("Password changed!");
             } catch (e) {
                 toast(e.message, true);
             }
         });
 
-        /* Upload Picture */
-        changePicBtn.addEventListener("click", () => picInput.click());
+        /* Cropper Modal */
+        let cropper;
+        changePicBtn.onclick = () => picInput.click();
 
-        picInput.addEventListener("change", async e => {
+        picInput.onchange = e => {
             const file = e.target.files[0];
             if (!file) return;
 
-            const user = auth.currentUser;
-            if (!user) return;
+            cropImage.src = URL.createObjectURL(file);
+            document.getElementById("cropModal").classList.add("show");
 
-            try {
+            cropImage.onload = () => {
+                cropper = new Cropper(cropImage, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    autoCropArea: 0.9
+                });
+            };
+        };
+
+        cropClose.onclick = () => closeCrop();
+
+        function closeCrop() {
+            document.getElementById("cropModal").classList.remove("show");
+            if (cropper) cropper.destroy();
+            cropper = null;
+            picInput.value = "";
+        }
+
+        cropRotate.onclick = () => cropper.rotate(90);
+        cropReset.onclick = () => cropper.reset();
+
+        cropUpload.onclick = async() => {
+            const user = auth.currentUser;
+            if (!user) return toast("Not logged in", true);
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 600,
+                height: 600
+            });
+
+            canvas.toBlob(async blob => {
                 const ref = storage.ref(`profilePics/${user.uid}.jpg`);
-                await ref.put(file);
+                toast("Uploading image...");
+
+                await ref.put(blob);
                 const url = await ref.getDownloadURL();
 
                 await user.updateProfile({
@@ -391,34 +440,29 @@
                 });
 
                 profilePic.src = url;
-                toast("Picture updated!");
-            } catch (err) {
-                toast("Upload failed", true);
-            }
-        });
+                toast("Profile picture updated!");
+                closeCrop();
+            });
+        };
 
-        /* Remove Picture */
-        removePicBtn.addEventListener("click", async() => {
+        /* Remove picture */
+        removePicBtn.onclick = async() => {
             const user = auth.currentUser;
             if (!user) return;
 
-            try {
-                await storage.ref(`profilePics/${user.uid}.jpg`).delete().catch(() => {});
-                await user.updateProfile({
-                    photoURL: null
-                });
-                await db.collection("users").doc(user.uid).set({
-                    photo: null
-                }, {
-                    merge: true
-                });
+            await storage.ref(`profilePics/${user.uid}.jpg`).delete().catch(() => {});
+            await user.updateProfile({
+                photoURL: null
+            });
+            await db.collection("users").doc(user.uid).set({
+                photo: null
+            }, {
+                merge: true
+            });
 
-                profilePic.src = "https://i.imgur.com/4ZQZ4ZC.png";
-                toast("Picture removed!");
-            } catch (err) {
-                toast("Error removing picture", true);
-            }
-        });
+            profilePic.src = "https://i.imgur.com/4ZQZ4ZC.png";
+            toast("Picture removed");
+        };
     </script>
 
 </body>
