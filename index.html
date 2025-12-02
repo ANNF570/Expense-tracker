@@ -115,21 +115,6 @@
 
     <!-- Firebase Init -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
-            authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
-            projectId: "expense-tracker-akif-832fb",
-            storageBucket: "expense-tracker-akif-832fb.appspot.com",
-            messagingSenderId: "846826483222",
-            appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37",
-            measurementId: "G-ZSM3KCK8RF"
-        };
-
-
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
         // Show / Hide Password
         function togglePassword(id, el) {
             const input = document.getElementById(id);
@@ -219,8 +204,7 @@
     <!-- Theme logic (shared) -->
     <script src="theme.js"></script>
 
-    <!-- Main Logic -->
-    <script src="app.js"></script>
+
 </body>
 
 </html>
