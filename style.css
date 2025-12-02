@@ -632,3 +632,319 @@ h2 {
         height: 130px !important;
     }
 }
+
+
+/* ======================================================
+   THEME TOGGLE (3 buttons: Light | Spendora | Dark)
+======================================================*/
+
+.theme-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    overflow: hidden;
+    min-width: 170px;
+    font-size: 13px;
+}
+
+.theme-toggle-btn {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-weight: 600;
+    padding: 6px 8px;
+    cursor: pointer;
+    z-index: 1;
+    white-space: nowrap;
+}
+
+.theme-thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    width: calc(33.33% - 4px);
+    border-radius: 999px;
+    background: linear-gradient(90deg, #00f0ff, #ff2ec4);
+    box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+    transition: transform 0.25s ease;
+}
+
+
+/* Position slider depending on theme */
+
+html[data-theme="light"] .theme-thumb {
+    transform: translateX(0%);
+}
+
+html[data-theme="neon"] .theme-thumb {
+    transform: translateX(100%);
+}
+
+html[data-theme="dark"] .theme-thumb {
+    transform: translateX(200%);
+}
+
+
+/* Active label highlight */
+
+html[data-theme="light"] .theme-toggle-btn[data-theme="light"],
+html[data-theme="neon"] .theme-toggle-btn[data-theme="neon"],
+html[data-theme="dark"] .theme-toggle-btn[data-theme="dark"] {
+    color: #03111a;
+}
+
+
+/* Small wrapper tweak on mobile */
+
+@media (max-width: 600px) {
+    .theme-toggle {
+        min-width: 100%;
+    }
+}
+
+
+/* ======================================================
+   THEMES: LIGHT / NEON (default) / DARK
+   (Overrides only big surfaces so nothing breaks)
+======================================================*/
+
+
+/* Default (neon) – already matches your current design */
+
+html:not([data-theme]),
+html[data-theme="neon"] {
+    /* nothing special, we keep existing styles */
+}
+
+
+/* ---------- LIGHT THEME ---------- */
+
+html[data-theme="light"] body {
+    background: radial-gradient(circle at top, #ffffff 0%, #e4ebff 40%, #d7e0ff 100%);
+    color: #111528;
+}
+
+html[data-theme="light"] .card {
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.10);
+}
+
+html[data-theme="light"] .input,
+html[data-theme="light"] .select {
+    background: #f3f5ff;
+    color: #111528;
+    border: 1px solid rgba(15, 23, 42, 0.16);
+}
+
+html[data-theme="light"] .expense-list .exp-item {
+    background: #f6f7ff;
+    border-color: rgba(15, 23, 42, 0.08);
+}
+
+html[data-theme="light"] .sum-box {
+    background: #f7f8ff;
+    border-color: rgba(15, 23, 42, 0.10);
+}
+
+html[data-theme="light"] .neon-btn {
+    background: linear-gradient(90deg, #2563eb, #7c3aed);
+    color: #f9fafb;
+}
+
+html[data-theme="light"] .neon-btn.danger {
+    background: linear-gradient(90deg, #ef4444, #f97316);
+}
+
+html[data-theme="light"] .google-btn {
+    background: #ffffff;
+    color: #111528;
+    border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+
+/* Scrollbar for light */
+
+html[data-theme="light"] ::-webkit-scrollbar-track {
+    background: #e5e7f5;
+}
+
+
+/* ---------- DARK THEME (more muted than neon) ---------- */
+
+html[data-theme="dark"] body {
+    background: radial-gradient(circle at top, #020617 0%, #020617 40%, #000000 100%);
+    color: #e5e7eb;
+}
+
+html[data-theme="dark"] .card {
+    background: radial-gradient(circle at top left, rgba(40, 40, 80, 0.6), rgba(10, 10, 20, 0.9));
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+}
+
+html[data-theme="dark"] .input,
+html[data-theme="dark"] .select {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(148, 163, 184, 0.5);
+}
+
+html[data-theme="dark"] .expense-list .exp-item {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(148, 163, 184, 0.3);
+}
+
+html[data-theme="dark"] .sum-box {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(148, 163, 184, 0.4);
+}
+
+html[data-theme="dark"] .neon-btn {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    border-color: rgba(148, 163, 184, 0.6);
+}
+
+html[data-theme="dark"] .neon-btn.danger {
+    background: linear-gradient(135deg, #f97373, #fb7185);
+}
+
+html[data-theme="dark"] .google-btn {
+    background: rgba(15, 23, 42, 0.9);
+    border-color: rgba(148, 163, 184, 0.5);
+}
+
+
+/* Dark scrollbar tweak */
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: #020617;
+}
+
+
+/* ============================================================
+   PROFILE PAGE — FULL UI STYLES
+   ============================================================ */
+
+.profile-wrapper {
+    max-width: 900px;
+    margin: 40px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+}
+
+
+/* Profile Header */
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.profile-pic-box {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    padding: 4px;
+    background: linear-gradient(90deg, #00f0ff, #ff2ec4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-pic-box img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+/* Change / Remove buttons */
+
+.profile-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.profile-btn {
+    padding: 10px 18px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00f0ff, #ff2ec4);
+    color: #000;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+}
+
+body.light .profile-btn {
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+}
+
+.profile-btn-danger {
+    background: linear-gradient(90deg, #ff6b6b, #ff2e63);
+}
+
+
+/* Section titles */
+
+.profile-section-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 10px;
+    margin-bottom: 12px;
+}
+
+
+/* Inputs layout */
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+.profile-input,
+.profile-textarea {
+    padding: 12px;
+    border-radius: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    color: var(--text);
+    width: 100%;
+}
+
+.profile-textarea {
+    height: 120px;
+    resize: none;
+}
+
+
+/* Password fields */
+
+.password-box {
+    display: grid;
+    gap: 14px;
+}
+
+.profile-save-btn {
+    width: 100%;
+    padding: 12px;
+    font-weight: 700;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00f0ff, #ff2ec4);
+    border: none;
+    color: #000;
+    cursor: pointer;
+}
+
+body.light .profile-save-btn {
+    background: linear-gradient(90deg, #4facfe, #00f2fe);
+}

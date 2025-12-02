@@ -44,13 +44,31 @@
             </div>
 
             <!-- RIGHT SIDE -->
-            <div class="right-controls" style="display:flex;align-items:center;gap:10px;">
+            <div class="right-controls">
+                <!-- THEME TOGGLE -->
+                <div class="theme-toggle" id="themeToggle">
+                    <div class="theme-thumb"></div>
+
+                    <button class="theme-toggle-btn" data-theme="light" title="Light">
+            ☀️
+        </button>
+
+                    <button class="theme-toggle-btn" data-theme="neon" title="Spendora">
+            SP
+        </button>
+
+                    <button class="theme-toggle-btn" data-theme="dark" title="Dark">
+            🌙
+        </button>
+                </div>
+
                 <!-- Currency -->
                 <select id="currency" class="select" onchange="setCurrency(this.value)">
-          <option value="INR">₹ INR</option>
-          <option value="USD">$ USD</option>
-          <option value="EUR">€ EUR</option>
-        </select>
+      <option value="INR">₹ INR</option>
+      <option value="USD">$ USD</option>
+      <option value="EUR">€ EUR</option>
+    </select>
+
 
                 <!-- User Email -->
                 <span id="userEmail" class="user-email" style="font-weight:700;"></span>
@@ -201,6 +219,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Theme logic -->
+    <script src="theme.js"></script>
 
     <!-- app.js (contains all logic) -->
     <script src="app.js"></script>

@@ -52,8 +52,28 @@
     <div class="auth-wrap">
         <div class="card auth-card">
 
+
             <!-- OUR Spendora Logo -->
             <img src="assets/full_logo.png" class="logo-big" alt="Spendora Logo">
+
+            <!-- THEME TOGGLE -->
+            <div class="theme-toggle" id="themeToggle" style="margin-bottom:16px;">
+                <div class="theme-thumb"></div>
+
+                <button class="theme-toggle-btn" data-theme="light" title="Light">
+        ☀️
+    </button>
+
+                <button class="theme-toggle-btn" data-theme="neon" title="Spendora">
+        SP
+    </button>
+
+                <button class="theme-toggle-btn" data-theme="dark" title="Dark">
+        🌙
+    </button>
+            </div>
+
+
 
             <!-- LOGIN VIEW -->
             <div id="loginView">
@@ -204,6 +224,8 @@
         }
     </script>
 
+    <!-- Theme logic (shared) -->
+    <script src="theme.js"></script>
 
     <!-- Main Logic -->
     <script src="app.js"></script>
