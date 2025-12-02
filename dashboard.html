@@ -7,6 +7,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <link rel="stylesheet" href="style.css">
 
+    <link rel="manifest" href="manifest.json" />
+    <meta name="theme-color" content="#111133" />
+
+    <link rel="icon" type="image/png" sizes="192x192" href="/assets/icon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/assets/icon-512.png" />
+
+
     <!-- ChartJS -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -51,6 +58,8 @@
                 <!-- Neon Buttons -->
                 <button class="neon-btn" onclick="location.href='profile.html'">Profile</button>
                 <button class="neon-btn danger" onclick="signOut()">Logout</button>
+                <button id="installBtn" style="padding:8px 18px; border-radius:10px; background:#00f2fe; color:#000;border:none;cursor:pointer;font-weight:bold;display:none;">Install App</button>
+
             </div>
         </div>
 
@@ -195,6 +204,8 @@
 
     <!-- app.js (contains all logic) -->
     <script src="app.js"></script>
+
+
 </body>
 
 </html>

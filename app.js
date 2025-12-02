@@ -355,45 +355,40 @@ function updateCharts() {
         }
     });
 }
+/* ============================================================
+   EXPORT / IMPORT – SAFE VERSION (No Optional Chaining)
+   ============================================================ */
 
-/* ===========================
-   EXPORT / IMPORT Functionality
-   - exportToPDF() -> jsPDF + autoTable
-   - exportToWord() -> HTML -> .doc download
-   - exportUserData() -> JSON file
-   - importUserData(ev) -> load JSON and add to Firestore (keeps createdAt serverTimestamp)
-   =========================== */
-
-/* helpers for exports */
+/* ---------- 1. Helpers ---------- */
 function fmtDateForFile(d = new Date()) {
     const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
     return `${y}${m}${day}`;
-}
-
-function fmtDateDisplay(d) {
-    if (!d) return '';
-    const dd = new Date(d);
-    if (isNaN(dd)) return d;
-    return dd.toISOString().slice(0, 10);
 }
 
 function getExportFilters() {
     return {
-        from: document.getElementById('exportFrom').value || null,
-        to: document.getElementById('exportTo').value || null,
-        category: document.getElementById('exportCategory').value || ''
+        from: document.getElementById("exportFrom").value || null,
+        to: document.getElementById("exportTo").value || null,
+        category: document.getElementById("exportCategory").value || ""
     };
 }
 
+/* IMPORTANT: use the real `expenses` array (NOT window.expenses) */
 function filteredExpensesList(filters) {
-    const list = (window.expenses || []).slice();
+    const list = (expenses || []).slice(); // <--- changed
+
     return list.filter(e => {
         if (!e) return false;
-        if (filters.category && filters.category !== '' && e.category !== filters.category) return false;
-        if (filters.from) { if (!e.date) return false; if (e.date < filters.from) return false; }
-        if (filters.to) { if (!e.date) return false; if (e.date > filters.to) return false; }
+
+        // category match
+        if (filters.category && e.category !== filters.category) return false;
+
+        // date filters (assuming e.date is "YYYY-MM-DD")
+        if (filters.from && e.date < filters.from) return false;
+        if (filters.to && e.date > filters.to) return false;
+
         return true;
     });
 }
@@ -401,163 +396,236 @@ function filteredExpensesList(filters) {
 function computeSummaries(list) {
     const byCategory = {};
     let fullTotalINR = 0;
-    for (const it of list) {
+
+    list.forEach(it => {
         const amt = Number(it.amount || 0);
         fullTotalINR += amt;
         byCategory[it.category] = (byCategory[it.category] || 0) + amt;
-    }
+    });
+
     return { byCategory, fullTotalINR };
 }
+/* ============================================================
+   2. PDF EXPORT – HEADER + FOOTER + CLEAN TEXT (NO OPTIONAL CHAINING)
+   ============================================================ */
 
-/* Export to PDF */
 async function exportToPDF() {
     const filters = getExportFilters();
     const list = filteredExpensesList(filters);
-    const uid = (window.currentUser && window.currentUser.uid) || 'anon';
-    const filename = `spendora-${uid}-${fmtDateForFile(new Date())}.pdf`;
 
-    // create jsPDF
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const uid = (window.currentUser && window.currentUser.uid) || "anon";
+    const filename = "spendora-" + uid + "-" + fmtDateForFile(new Date()) + ".pdf";
+
+    const jsPDFClass = window.jspdf.jsPDF;
+    const doc = new jsPDFClass({ unit: "pt", format: "a4" });
+
+    doc.setFont("courier", "normal");
+
+    const pageWidth = doc.internal.pageSize.getWidth();
     const margin = 40;
-    let y = 40;
+    let startY = 90;
 
-    doc.setFontSize(18);
-    doc.setTextColor(240, 240, 255);
-    doc.text('Spendora — Expense Report', margin, y);
-    doc.setFontSize(10);
-    y += 18;
-    doc.setTextColor(180, 180, 200);
-    const filText = `Generated: ${new Date().toLocaleString()}  •  Filters: ${filters.category || 'All'}, ${filters.from || 'Any'} → ${filters.to || 'Any'}`;
-    doc.text(filText, margin, y);
-    y += 22;
+    /* ---------------- HEADER ---------------- */
+    function drawHeader() {
+        doc.setFontSize(16);
+        doc.text("📘 Spendora — Expense Report", margin, 40);
 
-    // prepare table body
-    const tableBody = list.map(it => [
-        it.title || '',
-        it.category || '',
-        (it.amount ? (Number(it.amount) * (rates[currency] || 1)).toFixed(2) : '0.00'),
-        it.date || '',
-        (it.createdAt && it.createdAt.toDate ? it.createdAt.toDate().toISOString().slice(0, 19).replace('T', ' ') : (it.createdAt || '')),
-        it.id || '',
-        (it.note ? 'Yes' : 'No')
-    ]);
+        doc.setFontSize(9);
+        doc.text("Generated: " + new Date().toLocaleString(), margin, 55);
 
-    if (tableBody.length === 0) {
-        doc.setFontSize(12);
-        doc.text('No expense records match the selected filters.', margin, y);
+        var filterText =
+            "Filters → Category: " + (filters.category || "All") +
+            ", Date: " + (filters.from || "Any") +
+            " → " + (filters.to || "Any");
+
+        doc.text(filterText, margin, 68);
+
+        doc.setLineWidth(0.4);
+        doc.line(margin, 75, pageWidth - margin, 75);
+    }
+
+    /* ---------------- FOOTER ---------------- */
+    function drawFooter() {
+        var pageCount = doc.internal.getNumberOfPages();
+        doc.setFontSize(9);
+
+        for (var i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            var pageHeight = doc.internal.pageSize.getHeight();
+
+            doc.setLineWidth(0.2);
+            doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
+
+            doc.text(
+                "Generated by Spendora | Page " + i + " of " + pageCount,
+                margin,
+                pageHeight - 25
+            );
+        }
+    }
+
+    drawHeader();
+
+    /* ---------------- TABLE BODY ---------------- */
+    var body = list.map(function(it) {
+        var createdAt = "";
+        if (it.createdAt && it.createdAt.toDate) {
+            createdAt = it.createdAt.toDate().toISOString().replace("T", " ").slice(0, 19);
+        }
+
+        return [
+            it.title || "",
+            it.category || "",
+            String((Number(it.amount) * (rates[currency] || 1)).toFixed(2)),
+            it.date || "",
+            createdAt,
+            it.id || "",
+            it.note ? "Yes" : "No"
+        ];
+    });
+
+    if (body.length === 0) {
+        doc.text("No data found for selected filters.", margin, startY);
     } else {
-        // Use autoTable
         doc.autoTable({
-            startY: y,
+            startY: startY,
             head: [
-                ['Title', 'Category', `Amount (${sym(currency)})`, 'Date', 'CreatedAt', 'ID', 'Note']
+                ["Title", "Category", "Amount (Rs)", "Date", "CreatedAt", "ID", "Note"]
             ],
-            body: tableBody,
-            styles: { halign: 'left', fontSize: 10, cellPadding: 6, textColor: [220, 220, 230] },
-            headStyles: { fillColor: [20, 20, 35], textColor: [200, 240, 255], fontStyle: 'bold' },
-            alternateRowStyles: { fillColor: [12, 8, 20] },
+            body: body,
+            theme: "striped",
             margin: { left: margin, right: margin },
-            theme: 'striped'
+            headStyles: { fillColor: [25, 25, 30] },
+
+            didDrawPage: function() {
+                drawHeader();
+            }
         });
     }
 
-    // totals & breakdown
-    const { byCategory, fullTotalINR } = computeSummaries(list);
-    const afterY = doc.lastAutoTable ? doc.lastAutoTable.finalY + 12 : doc.internal.pageSize.getHeight() - 120;
-    doc.setFontSize(12);
-    doc.text('Summary', margin, afterY);
-    doc.setFontSize(10);
-    let summaryY = afterY + 16;
-    doc.text(`Total (all items): ${sym(currency)}${(fullTotalINR * (rates[currency] || 1)).toLocaleString()}`, margin, summaryY);
-    summaryY += 14;
-    doc.text('By Category:', margin, summaryY);
-    summaryY += 12;
-    Object.keys(byCategory).forEach(cat => {
-        doc.text(`${cat}: ${sym(currency)}${(byCategory[cat] * (rates[currency] || 1)).toLocaleString()}`, margin + 10, summaryY);
-        summaryY += 12;
-    });
+    /* ---------------- SUMMARY ---------------- */
+    var finalY = startY + 30;
 
+    if (doc.lastAutoTable && doc.lastAutoTable.finalY) {
+        finalY = doc.lastAutoTable.finalY + 25;
+    }
+
+    var summaryData = computeSummaries(list);
+    var byCategory = summaryData.byCategory;
+    var fullTotalINR = summaryData.fullTotalINR;
+
+    doc.setFontSize(13);
+    doc.text("Summary", margin, finalY);
+    finalY += 18;
+
+    doc.setFontSize(10);
+    doc.text("Total: Rs " + (fullTotalINR * (rates[currency] || 1)).toLocaleString(), margin, finalY);
+    finalY += 18;
+
+    doc.text("Breakdown by Category:", margin, finalY);
+
+    for (var cat in byCategory) {
+        finalY += 15;
+        doc.text(
+            cat + ": Rs " + (byCategory[cat] * (rates[currency] || 1)).toLocaleString(),
+            margin + 12,
+            finalY
+        );
+    }
+
+    drawFooter();
     doc.save(filename);
 }
+
 window.exportToPDF = exportToPDF;
 
-/* Export to Word (HTML -> .doc) */
+/* ============================================================
+   3. WORD EXPORT (.doc)
+   ============================================================ */
 function exportToWord() {
     const filters = getExportFilters();
     const list = filteredExpensesList(filters);
-    const uid = (window.currentUser && window.currentUser.uid) || 'anon';
+
+    const uid = (currentUser && currentUser.uid) || "anon";
     const filename = `spendora-${uid}-${fmtDateForFile(new Date())}.doc`;
 
     let html = `
-    <!doctype html><html><head><meta charset="utf-8"><title>Spendora Report</title>
+    <html><head><meta charset="utf-8">
     <style>
-      body{font-family:Arial,Helvetica,sans-serif;color:#111}
-      table{border-collapse:collapse;width:100%}
-      th,td{border:1px solid #ddd;padding:8px}
-      th{background:#222;color:#fff;text-align:left}
+        body { font-family: Arial; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 6px; }
+        th { background: #222; color: white; }
     </style>
     </head><body>
     <h2>Spendora Expense Report</h2>
     <p>Generated: ${new Date().toLocaleString()}</p>
-    <p>Filters: ${filters.category || 'All'}, ${filters.from || 'Any'} → ${filters.to || 'Any'}</p>
-    <table><thead><tr>
-      <th>Title</th><th>Category</th><th>Amount (${sym(currency)})</th>
-      <th>Date</th><th>CreatedAt</th><th>ID</th><th>Note</th>
-    </tr></thead><tbody>`;
+    <p>Filters: ${filters.category || "All"}, ${filters.from || "Any"} → ${filters.to || "Any"}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th><th>Category</th><th>Amount (${sym(currency)})</th>
+                <th>Date</th><th>CreatedAt</th><th>ID</th><th>Note</th>
+            </tr>
+        </thead>
+        <tbody>`;
 
     list.forEach(it => {
-        const amt = (it.amount ? (Number(it.amount) * (rates[currency] || 1)).toFixed(2) : '0.00');
-        const createdAt = it.createdAt && it.createdAt.toDate ? it.createdAt.toDate().toISOString().slice(0, 19).replace('T', ' ') : (it.createdAt || '');
-        html += `<tr>
-      <td>${(it.title || '')}</td>
-      <td>${(it.category || '')}</td>
-      <td style="text-align:right">${amt}</td>
-      <td>${(it.date || '')}</td>
-      <td>${createdAt}</td>
-      <td>${(it.id || '')}</td>
-      <td>${(it.note ? 'Yes' : 'No')}</td>
-    </tr>`;
+        let createdAt = "";
+        if (it.createdAt && it.createdAt.toDate) {
+            createdAt = it.createdAt.toDate().toISOString().replace("T", " ").slice(0, 19);
+        }
+
+        html += `
+        <tr>
+            <td>${it.title || ""}</td>
+            <td>${it.category || ""}</td>
+            <td>${(Number(it.amount) * (rates[currency] || 1)).toFixed(2)}</td>
+            <td>${it.date || ""}</td>
+            <td>${createdAt}</td>
+            <td>${it.id || ""}</td>
+            <td>${it.note ? "Yes" : "No"}</td>
+        </tr>`;
     });
 
-    html += `</tbody></table>`;
+    html += `</tbody></table></body></html>`;
 
-    const { byCategory, fullTotalINR } = computeSummaries(list);
-    html += `<h3>Summary</h3><p>Total: ${sym(currency)}${(fullTotalINR * (rates[currency] || 1)).toLocaleString()}</p>`;
-    html += `<ul>`;
-    for (const c in byCategory) {
-        html += `<li>${c}: ${sym(currency)}${(byCategory[c] * (rates[currency] || 1)).toLocaleString()}</li>`;
-    }
-    html += `</ul></body></html>`;
-
-    // Create Blob and download
-    const blob = new Blob(['\ufeff', html], { type: 'application/msword' });
+    const blob = new Blob(["\ufeff", html], { type: "application/msword" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+
+    const a = document.createElement("a");
     a.href = url;
     a.download = filename;
     a.click();
+
     URL.revokeObjectURL(url);
 }
+
 window.exportToWord = exportToWord;
 
-/* JSON export/import (quick) */
+/* ============================================================
+   4. JSON Import/Export
+   ============================================================ */
 window.exportUserData = () => {
-    const payload = { exportedAt: new Date().toISOString(), expenses };
+    // Use the real `expenses` array
+    const payload = { exportedAt: new Date().toISOString(), expenses: expenses };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = (currentUser && currentUser.email ? currentUser.email : 'export') + "-expenses.json";
+    a.download = (currentUser && currentUser.email ? currentUser.email : "export") + "-expenses.json";
     a.click();
 };
 
-window.importUserData = async(ev) => {
-    let file = ev.target.files[0];
+window.importUserData = async ev => {
+    const file = ev.target.files[0];
     if (!file) return;
-    const txt = await file.text();
-    const json = JSON.parse(txt);
-    let list = json.expenses || json;
+
+    const json = JSON.parse(await file.text());
+    const list = json.expenses || json;
+
     const col = db.collection("users").doc(currentUser.uid).collection("expenses");
+
     for (const it of list) {
         await col.add({
             title: it.title || "Imported",
@@ -567,16 +635,21 @@ window.importUserData = async(ev) => {
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
     }
+
     ev.target.value = "";
 };
 
-/* Hook export buttons to functions (safe when DOM loaded) */
-document.addEventListener("DOMContentLoaded", () => {
-    const btnPDF = document.getElementById('btnExportPDF');
-    const btnWord = document.getElementById('btnExportWord');
-    if (btnPDF) btnPDF.addEventListener('click', exportToPDF);
-    if (btnWord) btnWord.addEventListener('click', exportToWord);
+/* ============================================================
+   5. Connect Buttons
+   ============================================================ */
+firebase.auth().onAuthStateChanged(() => {
+    const btnPDF = document.getElementById("btnExportPDF");
+    const btnWord = document.getElementById("btnExportWord");
+
+    if (btnPDF) btnPDF.onclick = exportToPDF;
+    if (btnWord) btnWord.onclick = exportToWord;
 });
+
 
 /* ===========================
    Toast (small helper) - optional
@@ -713,3 +786,29 @@ document.querySelectorAll(".toggle-btn").forEach(btn => {
 
 // Auto-load Daily on page load
 setTimeout(() => renderTotalChart("daily"), 1000);
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js")
+        .then(() => console.log("Service Worker Registered"))
+        .catch(err => console.log("SW registration failed", err));
+}
+
+let deferredPrompt;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById("installBtn").style.display = "block";
+});
+
+document.getElementById("installBtn").addEventListener("click", async() => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome === "accepted") {
+            console.log("App Installed!");
+        }
+        deferredPrompt = null;
+        document.getElementById("installBtn").style.display = "none";
+    }
+});
