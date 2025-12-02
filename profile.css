@@ -153,3 +153,102 @@ html[data-theme="neon"] .theme-thumb {
 html[data-theme="dark"] .theme-thumb {
     transform: translateX(200%);
 }
+
+
+/* ==========================================================
+   RESPONSIVE — TABLETS (max-width: 900px)
+========================================================== */
+
+@media (max-width: 900px) {
+    .row {
+        flex-direction: column;
+        gap: 25px;
+    }
+    .left-col {
+        width: 100%;
+        text-align: center;
+    }
+    .profile-pic {
+        width: 120px;
+        height: 120px;
+    }
+    .theme-toggle {
+        width: 160px;
+        margin: 0 auto;
+    }
+}
+
+
+/* ==========================================================
+   RESPONSIVE — MOBILE (max-width: 600px)
+========================================================== */
+
+@media (max-width: 600px) {
+    .profile-wrapper {
+        padding: 0 14px;
+        gap: 25px;
+    }
+    .row {
+        flex-direction: column;
+        gap: 18px;
+    }
+    .left-col {
+        width: 100%;
+        text-align: center;
+    }
+    .profile-pic {
+        width: 110px;
+        height: 110px;
+        border-width: 3px;
+    }
+    /* Input fields full width */
+    .input,
+    .textarea,
+    select {
+        width: 100%;
+        font-size: 15px;
+        padding: 10px 12px;
+    }
+    /* Theme toggle full-width on phone */
+    .theme-toggle {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .theme-toggle-btn {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
+    .theme-thumb {
+        width: calc(33.33% - 4px);
+    }
+    /* Buttons */
+    .btn,
+    .danger-btn {
+        padding: 10px;
+        font-size: 15px;
+    }
+}
+
+
+/* ==========================================================
+   SMALL PHONES (max-width: 400px)
+========================================================== */
+
+@media (max-width: 400px) {
+    .profile-pic {
+        width: 95px;
+        height: 95px;
+    }
+    .theme-toggle {
+        width: 100%;
+        padding: 3px;
+    }
+    .theme-toggle-btn {
+        font-size: 13px;
+    }
+    .input,
+    .textarea,
+    select {
+        font-size: 14px;
+    }
+}
