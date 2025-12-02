@@ -1,0 +1,155 @@
+/* Profile Layout */
+
+.row {
+    display: flex;
+    gap: 20px;
+}
+
+.left-col {
+    width: 180px;
+    text-align: center;
+}
+
+.profile-pic {
+    width: 135px;
+    height: 135px;
+    border-radius: 50%;
+    border: 4px solid var(--cyan);
+    object-fit: cover;
+}
+
+
+/* Inputs */
+
+.input,
+.textarea,
+select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 10px;
+    border: 2px solid var(--input-border);
+    background: var(--input-bg);
+    color: var(--text);
+}
+
+.textarea {
+    min-height: 90px;
+}
+
+
+/* Buttons */
+
+.btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(90deg, var(--cyan), var(--pink));
+    border: none;
+    color: #03111a;
+    font-weight: 700;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.danger-btn {
+    background: #ff4e66;
+}
+
+
+/* Password visibility */
+
+.pass-wrap {
+    position: relative;
+}
+
+.toggle-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+
+/* BACK LINK */
+
+.back-link {
+    display: block;
+    margin-top: 12px;
+}
+
+
+/* CROP MODAL */
+
+.crop-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.crop-modal.show {
+    display: flex;
+}
+
+.crop-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 16px;
+    border-radius: 12px;
+}
+
+.crop-preview img {
+    max-width: 100%;
+}
+
+
+/* THEME TOGGLE (same design across all pages) */
+
+.theme-toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    gap: 0;
+    width: 170px;
+}
+
+.theme-toggle-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.theme-thumb {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    width: calc(33.33% - 4px);
+    background: linear-gradient(90deg, #00f0ff, #ff2ec4);
+    border-radius: 999px;
+    transition: transform 0.25s ease;
+    z-index: 1;
+}
+
+
+/* Thumb positions */
+
+html[data-theme="light"] .theme-thumb {
+    transform: translateX(0%);
+}
+
+html[data-theme="neon"] .theme-thumb {
+    transform: translateX(100%);
+}
+
+html[data-theme="dark"] .theme-thumb {
+    transform: translateX(200%);
+}

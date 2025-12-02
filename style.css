@@ -948,3 +948,21 @@ body.light .profile-btn {
 body.light .profile-save-btn {
     background: linear-gradient(90deg, #4facfe, #00f2fe);
 }
+
+
+/* Make theme toggle clickable over header glow */
+
+.card.header {
+    position: relative;
+}
+
+.card.header::before {
+    pointer-events: none;
+    /* allow clicks to pass through */
+}
+
+#themeToggle {
+    position: relative;
+    z-index: 5;
+    /* sit above the header content */
+}

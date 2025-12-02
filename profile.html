@@ -6,249 +6,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Spendora — Profile</title>
 
+    <!-- GLOBAL CSS -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="profile.css">
+
     <!-- Firebase v8 -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-    <!-- CropperJS -->
+    <!-- Cropper JS -->
     <link rel="stylesheet" href="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.css" />
     <script src="https://unpkg.com/cropperjs@1.5.13/dist/cropper.min.js"></script>
-
-    <style>
-         :root {
-            --bg: linear-gradient(135deg, #050308 0%, #0b0630 60%);
-            --text: #eaf7ff;
-            --card: rgba(255, 255, 255, 0.03);
-            --input-bg: rgba(0, 0, 0, 0.25);
-            --input-border: rgba(255, 255, 255, 0.08);
-            --cyan: #00f0ff;
-            --pink: #ff2ec4;
-        }
-        
-        body.light {
-            --bg: #f3f6fa;
-            --text: #111;
-            --card: #ffffff;
-            --input-bg: #f0f2f7;
-            --input-border: #ccc;
-        }
-        
-        body.neon {
-            --bg: linear-gradient(135deg, #02040f, #0a0030 70%);
-            --text: #eaf7ff;
-            --card: rgba(255, 255, 255, 0.04);
-            --input-bg: rgba(255, 255, 255, 0.08);
-        }
-        
-        body.dark {
-            --bg: #0c0c0c;
-            --text: #eee;
-            --card: #131313;
-            --input-bg: #1f1f1f;
-            --input-border: #333;
-        }
-        
-        body {
-            margin: 0;
-            font-family: Inter, system-ui;
-            background: var(--bg);
-            color: var(--text);
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 16px;
-        }
-        
-        .card {
-            background: var(--card);
-            border-radius: 14px;
-            padding: 28px;
-            border: 1px solid var(--input-border);
-            backdrop-filter: blur(10px);
-        }
-        
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        /* THEME TOGGLE */
-        
-        .theme-toggle {
-            width: 150px;
-            height: 45px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 40px;
-            padding: 4px;
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin-bottom: 18px;
-        }
-        
-        .theme-thumb {
-            position: absolute;
-            width: 48px;
-            height: 38px;
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
-            border-radius: 40px;
-            top: 50%;
-            transform: translateY(-50%);
-            left: 4px;
-            transition: 0.25s ease;
-            z-index: 1;
-        }
-        
-        .theme-toggle-btn {
-            width: 48px;
-            height: 38px;
-            background: transparent;
-            border: none;
-            border-radius: 40px;
-            font-size: 15px;
-            color: var(--text);
-            cursor: pointer;
-            z-index: 2;
-        }
-        
-        .pos-light .theme-thumb {
-            left: 4px;
-        }
-        
-        .pos-neon .theme-thumb {
-            left: 52px;
-        }
-        
-        .pos-dark .theme-thumb {
-            left: 100px;
-        }
-        
-        .row {
-            display: flex;
-            gap: 20px;
-        }
-        
-        .left-col {
-            width: 180px;
-            text-align: center;
-        }
-        
-        .profile-pic {
-            width: 135px;
-            height: 135px;
-            border-radius: 50%;
-            border: 4px solid var(--cyan);
-            object-fit: cover;
-        }
-        
-        .input,
-        select,
-        .textarea {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid var(--input-border);
-            background: var(--input-bg);
-            color: var(--text);
-            margin-bottom: 12px;
-        }
-        
-        .textarea {
-            min-height: 90px;
-        }
-        
-        .btn {
-            width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: none;
-            cursor: pointer;
-            font-weight: 700;
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
-            color: #03111a;
-            margin-top: 10px;
-        }
-        
-        .danger-btn {
-            width: 100%;
-            padding: 12px;
-            background: #ff4e66;
-            border-radius: 10px;
-            border: none;
-            color: white;
-            font-weight: 700;
-        }
-        
-        .pass-wrap {
-            position: relative;
-        }
-        
-        .toggle-eye {
-            position: absolute;
-            right: 14px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-        }
-        
-        .crop-modal {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            visibility: hidden;
-            opacity: 0;
-            transition: 0.2s;
-            z-index: 2000;
-        }
-        
-        .crop-modal.show {
-            visibility: visible;
-            opacity: 1;
-        }
-        
-        .crop-card {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .crop-preview {
-            max-width: 450px;
-            max-height: 450px;
-            overflow: hidden;
-            margin: 12px auto;
-        }
-        
-        #toastBox {
-            position: fixed;
-            bottom: 25px;
-            right: 25px;
-            z-index: 9999;
-        }
-        
-        .toast {
-            padding: 14px 18px;
-            background: rgba(0, 0, 0, 0.75);
-            border-left: 4px solid var(--cyan);
-            border-radius: 8px;
-            margin-top: 10px;
-        }
-    </style>
 </head>
 
 <body>
-
-    <!-- Load saved theme immediately -->
-    <script>
-        document.body.classList.add(localStorage.getItem("theme") || "neon");
-    </script>
 
     <div class="container">
         <div class="card">
@@ -257,8 +30,10 @@
 
             <div class="row">
 
+                <!-- LEFT -->
                 <div class="left-col">
 
+                    <!-- THEME TOGGLE -->
                     <div id="themeToggle" class="theme-toggle">
                         <div class="theme-thumb"></div>
                         <button class="theme-toggle-btn" data-theme="light">☀️</button>
@@ -273,51 +48,49 @@
                     <button id="removePicBtn" class="danger-btn">Remove Picture</button>
                 </div>
 
+                <!-- RIGHT -->
                 <div class="right-col">
 
                     <input id="profileName" class="input" placeholder="Full name">
                     <input id="profileEmail" class="input" readonly>
                     <input id="profilePhone" class="input" placeholder="Phone">
 
-                    <div style="display:flex; gap:12px;">
+                    <div class="flex-row">
                         <select id="profileGender" class="input">
                             <option value="">Gender</option>
                             <option>Male</option>
                             <option>Female</option>
                             <option>Other</option>
                         </select>
+
                         <input id="profileDob" type="date" class="input">
                     </div>
 
                     <textarea id="profileBio" class="textarea" placeholder="Short bio..."></textarea>
 
-                    <hr style="margin:20px 0;border-color:var(--input-border)">
-
-                    <h2>Change Password</h2>
+                    <h2>Password</h2>
 
                     <div class="pass-wrap">
-                        <input id="oldPass" class="input" type="password" placeholder="Current password">
-                        <span onclick="togglePass('oldPass')" class="toggle-eye">👁️</span>
+                        <input id="oldPass" class="input" type="password" placeholder="Current">
+                        <span class="toggle-eye" onclick="togglePass('oldPass')">👁️</span>
                     </div>
 
                     <div class="pass-wrap">
                         <input id="newPass" class="input" type="password" placeholder="New password">
-                        <span onclick="togglePass('newPass')" class="toggle-eye">👁️</span>
+                        <span class="toggle-eye" onclick="togglePass('newPass')">👁️</span>
                     </div>
 
                     <div class="pass-wrap">
-                        <input id="confirmPass" class="input" type="password" placeholder="Confirm password">
-                        <span onclick="togglePass('confirmPass')" class="toggle-eye">👁️</span>
+                        <input id="confirmPass" class="input" type="password" placeholder="Confirm">
+                        <span class="toggle-eye" onclick="togglePass('confirmPass')">👁️</span>
                     </div>
 
-                    <button id="changePassBtn" class="btn" style="background:linear-gradient(90deg,#ff9a9e,#ff2ec4)">
-                        Update Password
-                    </button>
-
+                    <button id="changePassBtn" class="btn">Update Password</button>
                     <button id="saveProfileBtn" class="btn">Save Profile</button>
 
-                    <a href="dashboard.html" style="color:var(--cyan);display:block;margin-top:12px;">⬅ Back to Dashboard</a>
+                    <a href="dashboard.html" class="back-link">⬅ Back to Dashboard</a>
                 </div>
+
             </div>
         </div>
     </div>
@@ -325,206 +98,31 @@
     <!-- CROP MODAL -->
     <div id="cropModal" class="crop-modal">
         <div class="crop-card">
-            <div style="display:flex;justify-content:space-between;">
-                <b>Crop & Upload Picture</b>
-                <button id="cropClose" style="background:none;border:none;color:white;font-size:20px;cursor:pointer;">✕</button>
+
+            <div class="crop-header">
+                <b>Crop & Upload</b>
+                <button id="cropClose" class="crop-close">✕</button>
             </div>
 
             <div class="crop-preview">
                 <img id="cropImage">
             </div>
 
-            <div style="display:flex; gap:10px;">
-                <button id="cropRotate" class="btn" style="background:#222;color:var(--cyan)">Rotate</button>
-                <button id="cropReset" class="btn" style="background:#222;color:var(--cyan)">Reset</button>
-                <button id="cropUpload" class="btn">Upload</button>
+            <div class="crop-actions">
+                <button id="cropRotate" class="btn small-btn">Rotate</button>
+                <button id="cropReset" class="btn small-btn">Reset</button>
+                <button id="cropUpload" class="btn small-btn">Upload</button>
             </div>
+
         </div>
     </div>
 
     <div id="toastBox"></div>
 
-    <!-- 🔥 FIREBASE LOGIC (UNTOUCHED) -->
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
-            authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
-            projectId: "expense-tracker-akif-832fb",
-            storageBucket: "expense-tracker-akif-832fb.appspot.com",
-            messagingSenderId: "846826483222",
-            appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37"
-        };
+    <!-- PROFILE JS -->
+    <script src="profile.js"></script>
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-
-        function toast(msg, err = false) {
-            const box = document.getElementById("toastBox");
-            const el = document.createElement("div");
-            el.className = "toast" + (err ? " error" : "");
-            el.textContent = msg;
-            box.appendChild(el);
-            setTimeout(() => el.remove(), 3000);
-        }
-
-        function togglePass(id) {
-            const x = document.getElementById(id);
-            x.type = x.type === "password" ? "text" : "password";
-        }
-
-        /* LOAD PROFILE */
-        auth.onAuthStateChanged(async user => {
-            if (!user) return location.href = "index.html";
-
-            profileEmail.value = user.email;
-            if (user.photoURL) profilePic.src = user.photoURL;
-
-            const snap = await db.collection("users").doc(user.uid).get();
-            if (snap.exists) {
-                const d = snap.data();
-                profileName.value = d.name || "";
-                profilePhone.value = d.phone || "";
-                profileGender.value = d.gender || "";
-                profileDob.value = d.dob || "";
-                profileBio.value = d.bio || "";
-                if (d.photo) profilePic.src = d.photo;
-            }
-
-            if (user.providerData[0].providerId === "google.com") {
-                oldPass.closest(".pass-wrap").style.display = "none";
-                newPass.closest(".pass-wrap").style.display = "none";
-                confirmPass.closest(".pass-wrap").style.display = "none";
-                changePassBtn.style.display = "none";
-            }
-        });
-
-        /* SAVE PROFILE */
-        saveProfileBtn.onclick = async() => {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            const data = {
-                name: profileName.value.trim(),
-                phone: profilePhone.value.trim(),
-                gender: profileGender.value,
-                dob: profileDob.value,
-                bio: profileBio.value.trim(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            await db.collection("users").doc(user.uid).set(data, {
-                merge: true
-            });
-            await user.updateProfile({
-                displayName: data.name
-            });
-            toast("Profile updated!");
-        };
-
-        /* PASSWORD CHANGE */
-        changePassBtn.onclick = async() => {
-            const user = auth.currentUser;
-
-            const oldP = oldPass.value.trim();
-            const newP = newPass.value.trim();
-            const conP = confirmPass.value.trim();
-
-            if (!oldP || !newP || !conP) return toast("Fill all fields", true);
-            if (newP !== conP) return toast("Passwords do not match", true);
-            if (newP.length < 6) return toast("Password must be 6+ chars", true);
-
-            try {
-                const cred = firebase.auth.EmailAuthProvider.credential(user.email, oldP);
-                await user.reauthenticateWithCredential(cred);
-                await user.updatePassword(newP);
-
-                oldPass.value = newPass.value = confirmPass.value = "";
-                toast("Password changed!");
-            } catch (e) {
-                toast(e.message, true);
-            }
-        };
-
-        /* CROP + UPLOAD */
-        let cropper;
-
-        changePicBtn.onclick = () => picInput.click();
-
-        picInput.onchange = e => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            cropImage.src = URL.createObjectURL(file);
-            cropModal.classList.add("show");
-
-            cropImage.onload = () => {
-                cropper = new Cropper(cropImage, {
-                    aspectRatio: 1,
-                    viewMode: 1
-                });
-            };
-        };
-
-        cropClose.onclick = () => {
-            cropModal.classList.remove("show");
-            if (cropper) cropper.destroy();
-        };
-
-        cropUpload.onclick = async() => {
-            const user = auth.currentUser;
-            if (!user || !cropper) return;
-
-            const canvas = cropper.getCroppedCanvas({
-                width: 600,
-                height: 600
-            });
-
-            canvas.toBlob(async blob => {
-                const ref = storage.ref(`profilePics/${user.uid}.jpg`);
-                toast("Uploading...");
-                await ref.put(blob);
-
-                const url = await ref.getDownloadURL();
-
-                await user.updateProfile({
-                    photoURL: url
-                });
-                await db.collection("users").doc(user.uid).set({
-                    photo: url
-                }, {
-                    merge: true
-                });
-
-                profilePic.src = url;
-                toast("Picture updated!");
-                cropModal.classList.remove("show");
-                cropper.destroy();
-            });
-        };
-
-        removePicBtn.onclick = async() => {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            await storage.ref(`profilePics/${user.uid}.jpg`).delete().catch(() => {});
-
-            await user.updateProfile({
-                photoURL: null
-            });
-            await db.collection("users").doc(user.uid).set({
-                photo: null
-            }, {
-                merge: true
-            });
-
-            profilePic.src = "https://i.imgur.com/4ZQZ4ZC.png";
-            toast("Picture removed");
-        };
-    </script>
-
-    <!-- THEME JS -->
+    <!-- GLOBAL THEME JS -->
     <script src="theme.js"></script>
 
 </body>
