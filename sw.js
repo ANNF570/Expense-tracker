@@ -1,17 +1,15 @@
 self.addEventListener("install", e => {
     e.waitUntil(
-        caches.open("spendora-v1").then(cache => {
+        caches.open("spendora-v2").then(cache => {
             return cache.addAll([
                 "/",
-                "/index.html",
-                "/dashboard.html",
                 "/style.css",
                 "/app.js",
+                "/theme.js",
                 "/manifest.json",
                 "/assets/icon-192.png",
                 "/assets/icon-512.png",
             ]);
-
         })
     );
 });
