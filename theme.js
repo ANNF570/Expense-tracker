@@ -1,5 +1,5 @@
 /* ============================================
-   GLOBAL THEME HANDLER (Works for all pages)
+   GLOBAL THEME HANDLER FOR ALL PAGES
 ============================================ */
 
 const THEMES = ["light", "neon", "dark"];
@@ -7,18 +7,25 @@ const THEMES = ["light", "neon", "dark"];
 function applyTheme(mode) {
     if (!THEMES.includes(mode)) mode = "neon";
 
-    // Apply theme to <html> NOT <body>
+    // APPLY CORRECTLY (HTML ATTRIBUTE)
     document.documentElement.setAttribute("data-theme", mode);
 
     // Save
     localStorage.setItem("theme", mode);
 }
 
+/* ============================================
+   LOAD SAVED THEME
+============================================ */
 document.addEventListener("DOMContentLoaded", () => {
+
     const saved = localStorage.getItem("theme") || "neon";
     applyTheme(saved);
 
+    // Attach theme buttons
     document.querySelectorAll(".theme-toggle-btn").forEach(btn => {
-        btn.onclick = () => applyTheme(btn.dataset.theme);
+        btn.addEventListener("click", () => {
+            applyTheme(btn.dataset.theme);
+        });
     });
 });
