@@ -13,6 +13,27 @@
  *  - Keeps chart instances safe (destroy before recreate).
  **********************************************************************/
 
+
+// Firebase init (shared for all pages)
+const firebaseConfig = {
+    apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
+    authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
+    projectId: "expense-tracker-akif-832fb",
+    storageBucket: "expense-tracker-akif-832fb.firebasestorage.app",
+    messagingSenderId: "846826483222",
+    appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37",
+    measurementId: "G-ZSM3KCK8RF"
+};
+
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+
 /* =======================
    Configuration / Globals
    ======================= */
@@ -34,21 +55,6 @@ if (!rates) {
     rates = { INR: 1, USD: 0.012, EUR: 0.011 };
     localStorage.setItem(STORAGE_RATES_KEY, JSON.stringify(rates));
 }
-
-const firebaseConfig = {
-    apiKey: "AIzaSyAXu1FJ0VhjM0XxYIfs7KLDx1Chh1tDBfw",
-    authDomain: "expense-tracker-akif-832fb.firebaseapp.com",
-    projectId: "expense-tracker-akif-832fb",
-    storageBucket: "expense-tracker-akif-832fb.firebasestorage.app",
-    messagingSenderId: "846826483222",
-    appId: "1:846826483222:web:2fcc5d66100a14c6fc0f37",
-    measurementId: "G-ZSM3KCK8RF"
-};
-
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-const storage = firebase.storage();
 
 /* ===========================
    DOM elements + local state
